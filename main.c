@@ -1,30 +1,24 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h> // Ajout de la bibliothèque SDL_ttf pour le texte
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "header/create_account.h"
+#include "header/connect_account.h"
+#include "header/main_menu.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 750;
 
-// Fonction pour créer un bouton simple
-SDL_Texture *createSimpleButton(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect *buttonRect)
+SDL_Texture *createButton(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect *buttonRect)
 {
-    // Couleur du texte du bouton
     SDL_Color textColor = {0, 0, 0, 255};
-
-    // Surface pour le texte
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, textColor);
-
-    // Texture du texte
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-
-    // Libération de la surface
     SDL_FreeSurface(textSurface);
 
-    // Obtenir les dimensions de la surface pour positionner le bouton au centre
     SDL_QueryTexture(textTexture, NULL, NULL, &(buttonRect->w), &(buttonRect->h));
     buttonRect->x = (SCREEN_WIDTH - buttonRect->w) / 2;
-    buttonRect->y = (SCREEN_HEIGHT - buttonRect->h) / 2;
+    buttonRect->y += 50;
 
     return textTexture;
 }
@@ -32,24 +26,22 @@ SDL_Texture *createSimpleButton(SDL_Renderer *renderer, TTF_Font *font, const ch
 int main(int argc, char *args[])
 {
     SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL; // Ajout du renderer
+    SDL_Renderer *renderer = NULL;
+    TTF_Font *font = NULL;
 
-    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
 
-    // Initialize SDL_ttf
     if (TTF_Init() == -1)
     {
         printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
         return 1;
     }
 
-    // Create window
-    window = SDL_CreateWindow("Nouvelle fenêtre SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Votre gestionnaire de base de données !!", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -57,7 +49,6 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    // Create renderer
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
     {
@@ -67,9 +58,7 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    // Create a font
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24); // Remplacez le chemin par le chemin de votre police
-
+    font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
     if (font == NULL)
     {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -79,12 +68,17 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    // Create a button
-    SDL_Rect buttonRect;
-    SDL_Texture *buttonTexture = createSimpleButton(renderer, font, "Salut salut !!", &buttonRect);
+    SDL_Rect connectButtonRect;
+    SDL_Rect createAccountButtonRect;
+
+    SDL_Texture *connectButtonTexture = createButton(renderer, font, "Se Connecter", &connectButtonRect);
+    SDL_Texture *createAccountButtonTexture = createButton(renderer, font, "Creer un Compte", &createAccountButtonRect);
+
+    enum ProgramState currentState = STATE_MAIN_MENU;
 
     SDL_Event e;
     bool quit = false;
+
     while (!quit)
     {
         while (SDL_PollEvent(&e))
@@ -93,28 +87,55 @@ int main(int argc, char *args[])
             {
                 quit = true;
             }
-            else if (e.type == SDL_KEYDOWN)
+
+            switch (currentState)
             {
-                if (e.key.keysym.sym == SDLK_ESCAPE)
+            case STATE_MAIN_MENU:
+                if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
-                    quit = true;
+                    int mouseX, mouseY;
+                    SDL_GetMouseState(&mouseX, &mouseY);
+
+                    if (mouseX >= connectButtonRect.x && mouseX <= connectButtonRect.x + connectButtonRect.w &&
+                        mouseY >= connectButtonRect.y && mouseY <= connectButtonRect.y + connectButtonRect.h)
+                    {
+                        currentState = STATE_CONNECT_ACCOUNT;
+                    }
+
+                    if (mouseX >= createAccountButtonRect.x && mouseX <= createAccountButtonRect.x + createAccountButtonRect.w &&
+                        mouseY >= createAccountButtonRect.y && mouseY <= createAccountButtonRect.y + createAccountButtonRect.h)
+                    {
+                        currentState = STATE_CREATE_ACCOUNT;
+                    }
                 }
+                break;
             }
         }
 
-        // Effacer l'écran
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        // Dessiner le bouton
-        SDL_RenderCopy(renderer, buttonTexture, NULL, &buttonRect);
+        switch (currentState)
+        {
+        case STATE_MAIN_MENU:
+            SDL_RenderCopy(renderer, connectButtonTexture, NULL, &connectButtonRect);
+            SDL_RenderCopy(renderer, createAccountButtonTexture, NULL, &createAccountButtonRect);
+            break;
 
-        // Mettre à jour l'affichage
+        case STATE_CONNECT_ACCOUNT:
+            showConnectAccountPage(renderer, font, &currentState);
+            break;
+        
+        case STATE_CREATE_ACCOUNT:
+            showCreateAccountPage(renderer, font, &currentState);
+            break;
+        }
+
         SDL_RenderPresent(renderer);
     }
 
-    // Libérer les ressources
-    SDL_DestroyTexture(buttonTexture);
+    SDL_DestroyTexture(connectButtonTexture);
+    SDL_DestroyTexture(createAccountButtonTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     TTF_CloseFont(font);
@@ -122,4 +143,5 @@ int main(int argc, char *args[])
     SDL_Quit();
 
     return 0;
+
 }
