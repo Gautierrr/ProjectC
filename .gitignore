@@ -6,3 +6,6 @@ Makefile
 
 # Ignorer le fichier create_account_secour.c
 create_account_secour.c
+
+# Ignorer le dossier .vscode
+.vscode/
