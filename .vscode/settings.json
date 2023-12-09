@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "stdio.h": "c",
-        "create_account.h": "c",
-        "connect_account.h": "c",
-        "main_menu.h": "c"
-    }
-}
