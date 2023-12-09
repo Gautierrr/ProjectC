@@ -47,8 +47,6 @@ void showConnectAccountPage(SDL_Renderer *renderer, TTF_Font *font, enum Program
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        // Dessiner les éléments de la page de connexion de compte ici
-
         SDL_RenderCopy(renderer, backButtonTexture, NULL, &backButtonRect);
 
         SDL_RenderPresent(renderer);

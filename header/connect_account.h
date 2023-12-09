@@ -8,7 +8,6 @@
 
 
 SDL_Texture *createAccountButton(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect *buttonRect);
-
 void showConnectAccountPage(SDL_Renderer *renderer, TTF_Font *font, enum ProgramState *currentState);
 
 #endif
