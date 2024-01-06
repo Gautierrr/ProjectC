@@ -1,147 +1,352 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "mysql/include/mysql.h"
+
 #include <stdio.h>
-#include <stdbool.h>
-#include "header/create_account.h"
-#include "header/connect_account.h"
-#include "header/main_menu.h"
+#include <string.h>
+#include <conio.h>
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 750;
+// Déclarations en amont ou prototypes de fonction
+void createAccount();
+int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
+int mainMenu(char *loggedInUsername, char *loggedInPassword);
+// void displayInfo();
+void changeSettings(char *currentUsername, char *currentPassword);
+int testMySQLConnection();
 
-SDL_Texture *createButton(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect *buttonRect)
+typedef struct Student
 {
-    SDL_Color textColor = {0, 0, 0, 255};
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, textColor);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
+    char studentUsername[50];
+    char studentPassword[20];
+} Student;
 
-    SDL_QueryTexture(textTexture, NULL, NULL, &(buttonRect->w), &(buttonRect->h));
-    buttonRect->x = (SCREEN_WIDTH - buttonRect->w) / 2;
-    buttonRect->y += 50;
+int main()
+{
+    char option;
+    int connect = 0;
+    char loggedInUsername[50];
+    char loggedInPassword[20];
+    int result = 0;
 
-    return textTexture;
+    while (option != '0')
+    {
+        system("cls");
+        printf("\t\t====== Graphical database generator and manager ======\n");
+        printf("\n\t\t====== Choose what you want : ======\n");
+        printf("\n\t\t\t1. Create an account");
+        printf("\n\t\t\t2. Log in to an account");
+        printf("\n\t\t\t3. Access the database management menu");
+        printf("\n\t\t\t0. Exit");
+
+        printf("\n\n\n\t\t\tEnter Your Option: ");
+        scanf(" %c", &option);
+        getchar();
+
+        switch (option)
+        {
+        case '1':
+            createAccount();
+            break;
+        case '2':
+            result = authenticateUser(&connect, loggedInUsername, loggedInPassword);
+            break;
+        case '3':
+            if (result == 1){
+                mainMenu(loggedInUsername, loggedInPassword);
+            } else {
+                system("cls");
+                printf("\n\n\t\t\tYou must be logged in to access the main menu.");
+                printf("\n\n\t\t\tEnter any keys to continue.......");
+                getch();
+            }
+            result = 0;
+            break;
+        case '4':
+            testMySQLConnection();
+            break;
+        /*case '4':
+            stateConnect(&connect);
+            break;*/
+        case '0':
+            printf("\n\t\t\t====== Thank You ======");
+            break;
+        default:
+            printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
+        }
+    }
+    return 0;
 }
 
-int main(int argc, char *args[])
+void createAccount()
 {
-    SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL;
-    TTF_Font *font = NULL;
+    FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (fp == NULL)
     {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-        return 1;
+        printf("\n\t\t\tError !\n");
     }
 
-    if (TTF_Init() == -1)
+    Student studentInformation;
+
+    system("cls");
+
+    printf("\t\t\t====== Create Student Account ======\n");
+
+    printf("\n\t\t\tEnter Student's Username : ");
+    getchar();
+    gets(studentInformation.studentUsername);
+    printf("\t\t\tEnter Student's Password : ");
+    gets(studentInformation.studentPassword);
+
+    fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
+
+    printf("\n\n\t\t\tInformations have been stored sucessfully\n");
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+
+    fclose(fp);
+}
+
+int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword)
+{
+    FILE *fp = fopen("bdd/studentInfo.bin", "rb");
+
+    if (fp == NULL)
     {
-        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-        return 1;
+        printf("\n\t\t\tError !\n");
     }
 
-    window = SDL_CreateWindow("Votre gestionnaire de base de données !!", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL)
-    {
-        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
-    }
+    Student studentInformation;
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL)
-    {
-        printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
+    system("cls");
 
-    font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    if (font == NULL)
-    {
-        printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
+    printf("\t\t\t====== Connect Student Account ======\n");
 
-    SDL_Rect connectButtonRect;
-    SDL_Rect createAccountButtonRect;
+    char username[50];
+    char password[20];
 
-    SDL_Texture *connectButtonTexture = createButton(renderer, font, "Se Connecter", &connectButtonRect);
-    SDL_Texture *createAccountButtonTexture = createButton(renderer, font, "Creer un Compte", &createAccountButtonRect);
+    printf("\n\t\t\tEnter your username: ");
+    scanf("%s", username);
 
-    enum ProgramState currentState = STATE_MAIN_MENU;
+    printf("\t\t\tEnter your password: ");
+    scanf("%s", password);
 
-    SDL_Event e;
-    bool quit = false;
+    printf("\n\t\t\tEntered username: %s\n", username);
+    printf("\t\t\tEntered password: %s\n", password);
 
-    while (!quit)
-    {
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
+    while (fread(&studentInformation, sizeof(studentInformation), 1, fp) == 1) {
+        printf("\n\t\t\tRead username: %s\n", studentInformation.studentUsername);
+        printf("\t\t\tRead password: %s\n", studentInformation.studentPassword);
 
-            switch (currentState)
-            {
-            case STATE_MAIN_MENU:
-                if (e.type == SDL_MOUSEBUTTONDOWN)
-                {
-                    int mouseX, mouseY;
-                    SDL_GetMouseState(&mouseX, &mouseY);
+        if (strcmp(username, studentInformation.studentUsername) == 0 && strcmp(password, studentInformation.studentPassword) == 0) {
+            printf("\n\n\t\t\tLogin Successful!\n");
+            *connect = 1;
 
-                    if (mouseX >= connectButtonRect.x && mouseX <= connectButtonRect.x + connectButtonRect.w &&
-                        mouseY >= connectButtonRect.y && mouseY <= connectButtonRect.y + connectButtonRect.h)
-                    {
-                        currentState = STATE_CONNECT_ACCOUNT;
-                    }
+            // Stocke les informations d'authentification
+            strcpy(loggedInUsername, username);
+            strcpy(loggedInPassword, password);
 
-                    if (mouseX >= createAccountButtonRect.x && mouseX <= createAccountButtonRect.x + createAccountButtonRect.w &&
-                        mouseY >= createAccountButtonRect.y && mouseY <= createAccountButtonRect.y + createAccountButtonRect.h)
-                    {
-                        currentState = STATE_CREATE_ACCOUNT;
-                    }
-                }
-                break;
-            }
+            printf("\n\t\t\ttkt: %s\n", loggedInUsername);
+            printf("\t\t\ttkt: %s\n", loggedInPassword);
+
+            // fclose(fp);
+            // return 1;
+        } else {
+            printf("\n\n\t\t\tLogin failed. Please try again.\n");
         }
-
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-
-        switch (currentState)
-        {
-        case STATE_MAIN_MENU:
-            SDL_RenderCopy(renderer, connectButtonTexture, NULL, &connectButtonRect);
-            SDL_RenderCopy(renderer, createAccountButtonTexture, NULL, &createAccountButtonRect);
-            break;
-
-        case STATE_CONNECT_ACCOUNT:
-            showConnectAccountPage(renderer, font, &currentState);
-            break;
-        
-        case STATE_CREATE_ACCOUNT:
-            showCreateAccountPage(renderer, font, &currentState);
-            break;
-        }
-
-        SDL_RenderPresent(renderer);
     }
 
-    SDL_DestroyTexture(connectButtonTexture);
-    SDL_DestroyTexture(createAccountButtonTexture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    TTF_CloseFont(font);
-    TTF_Quit();
-    SDL_Quit();
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+
+    fclose(fp);
+    return *connect;
+}
+
+int mainMenu(char *loggedInUsername, char *loggedInPassword)
+{
+    char option;
+
+    while (option != '0')
+    {
+        system("cls");
+        printf("\t\t====== Graphical database generator and manager ======\n");
+        printf("\n\t\t====== Choose what you want : ======\n");
+        printf("\n\t\t\t1. Create a database");
+        printf("\n\t\t\t2. Load a database");
+        printf("\n\t\t\t3. Change my settings");
+        printf("\n\t\t\t0. Sign out");
+
+        printf("\n\n\n\t\t\tEnter Your Option: ");
+        scanf(" %c", &option);
+        getchar();
+
+        switch (option)
+        {
+        case '1':
+            //createDatabase();
+            break;
+        case '2':
+            //loadDatabase();
+            break;
+        case '3':
+            changeSettings(loggedInUsername, loggedInPassword);
+            break;
+        case '0':
+            printf("\n\t\t\t====== Thank You ======");
+            break;
+        default:
+            printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
+        }
+    }
+    return 0;
+}
+
+void changeSettings(char *currentUsername, char *currentPassword)
+{
+    FILE *fp = fopen("bdd/studentInfo.bin", "rb+");
+
+    if (fp == NULL)
+    {
+        printf("\n\t\t\tError !\n");
+        return;
+    }
+
+    Student currentUser;
+
+    system("cls");
+    printf("\t\t\t====== Change User Settings ======\n");
+
+    int found = 0;
+
+    while (fread(&currentUser, sizeof(currentUser), 1, fp) == 1)
+    {
+        if (strcmp(currentUsername, currentUser.studentUsername) == 0 && strcmp(currentPassword, currentUser.studentPassword) == 0)
+        {
+            found = 1;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        // The user is found, allow modification
+        printf("\n\t\t\tEnter your new username: ");
+        scanf("%s", currentUser.studentUsername);
+
+        printf("\t\t\tEnter your new password: ");
+        scanf("%s", currentUser.studentPassword);
+
+        fseek(fp, -sizeof(currentUser), SEEK_CUR);
+        fwrite(&currentUser, sizeof(currentUser), 1, fp);
+
+        printf("\n\n\t\t\tUser settings updated successfully!\n");
+    }
+    else
+    {
+        printf("\n\n\t\t\tUser not found. Please check your current username and password.\n");
+    }
+
+    fclose(fp);
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+int testMySQLConnection()
+{
+    // Initialiser la connexion MySQL
+    MYSQL *conn = mysql_init(NULL);
+
+    // Établir la connexion à la base de données
+    if (mysql_real_connect(conn, "localhost", "root", "root", "projetC", 3306, NULL, 0)) {
+        printf("Connexion a la base de donnees reussie\n");
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+
+        // Exécuter des requêtes SQL ici
+
+        // Fermer la connexion MySQL
+        mysql_close(conn);
+    } else {
+        fprintf(stderr, "Echec de la connexion a la base de donnees: %s\n", mysql_error(conn));
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+    }
 
     return 0;
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+void displayInfo()
+{
+    FILE *fp = fopen("bdd/studentInfo.bin", "rb");
+
+    if (fp == NULL)
+    {
+        printf("\n\t\t\tError !\n");
+    }
+
+    Student studentInformation;
+
+    system("cls");
+
+    printf("\t\t\t\t====== All Students Information ======\n");
+
+    printf("\n\n\t\t%-20s%-20s\n", "Username", "Password");
+    printf("\t\t----------------------------------------------------------------------------------------");
+
+    while (fread(&studentInformation, sizeof(studentInformation), 1, fp) == 1)
+    {
+        printf("\n\n\t\t%-20s%-20s",studentInformation.studentUsername, studentInformation.studentPassword);
+    }
+
+    printf("\n\n\t\tEnter any keys to continue.......");
+    getch();
+
+    fclose(fp);
+}
+
+stateConnect(int *connect)
+{
+    printf("%d", *connect);
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}*/
