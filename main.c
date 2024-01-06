@@ -4,7 +4,6 @@
 #include <string.h>
 #include <conio.h>
 
-// Déclarations en amont ou prototypes de fonction
 void createAccount();
 int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
 int mainMenu(char *loggedInUsername, char *loggedInPassword);
@@ -59,10 +58,10 @@ int main()
             }
             result = 0;
             break;
-        case '4':
+        /*case '4':
             testMySQLConnection();
             break;
-        /*case '4':
+        case '4':
             stateConnect(&connect);
             break;*/
         case '0':
@@ -142,7 +141,6 @@ int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPasswor
             printf("\n\n\t\t\tLogin Successful!\n");
             *connect = 1;
 
-            // Stocke les informations d'authentification
             strcpy(loggedInUsername, username);
             strcpy(loggedInPassword, password);
 
@@ -175,6 +173,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword)
         printf("\n\t\t\t1. Create a database");
         printf("\n\t\t\t2. Load a database");
         printf("\n\t\t\t3. Change my settings");
+        printf("\n\t\t\t4. Know the database connection status");
         printf("\n\t\t\t0. Sign out");
 
         printf("\n\n\n\t\t\tEnter Your Option: ");
@@ -184,13 +183,16 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword)
         switch (option)
         {
         case '1':
-            //createDatabase();
+            createDatabase();
             break;
         case '2':
-            //loadDatabase();
+            loadDatabase();
             break;
         case '3':
             changeSettings(loggedInUsername, loggedInPassword);
+            break;
+        case '4':
+            testMySQLConnection();
             break;
         case '0':
             printf("\n\t\t\t====== Thank You ======");
@@ -232,7 +234,6 @@ void changeSettings(char *currentUsername, char *currentPassword)
 
     if (found)
     {
-        // The user is found, allow modification
         printf("\n\t\t\tEnter your new username: ");
         scanf("%s", currentUser.studentUsername);
 
@@ -257,21 +258,18 @@ void changeSettings(char *currentUsername, char *currentPassword)
 
 int testMySQLConnection()
 {
-    // Initialiser la connexion MySQL
     MYSQL *conn = mysql_init(NULL);
 
-    // Établir la connexion à la base de données
     if (mysql_real_connect(conn, "localhost", "root", "root", "projetC", 3306, NULL, 0)) {
-        printf("Connexion a la base de donnees reussie\n");
+        printf("\n\t\t\tDatabase connection successful\n");
         printf("\n\n\t\t\tEnter any keys to continue.......");
         getch();
 
         // Exécuter des requêtes SQL ici
 
-        // Fermer la connexion MySQL
         mysql_close(conn);
     } else {
-        fprintf(stderr, "Echec de la connexion a la base de donnees: %s\n", mysql_error(conn));
+        fprintf(stderr, "\n\t\t\tDatabase connection failed: %s\n", mysql_error(conn));
         printf("\n\n\t\t\tEnter any keys to continue.......");
         getch();
     }
@@ -279,9 +277,94 @@ int testMySQLConnection()
     return 0;
 }
 
+int createDatabase()
+{
+    system("cls");
+    printf("\t\t\t====== Creation of your new database ======\n");
 
+    MYSQL *conn = mysql_init(NULL);
 
+    if (conn == NULL) {
+        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        return 1;
+    }
 
+    if (mysql_real_connect(conn, "localhost", "root", "root", NULL, 3306, NULL, 0)) {
+        char dbName[100];
+        printf("\n\n\t\t\tEnter the name of the new database : ");
+        fgets(dbName, sizeof(dbName), stdin);
+
+        dbName[strcspn(dbName, "\n")] = '\0';
+
+        char query[150];
+        snprintf(query, sizeof(query), "CREATE DATABASE %s", dbName);
+
+        if (mysql_query(conn, query) == 0) {
+            printf("\n\n\t\t\tDatabase '%s' created successfully.\n", dbName);
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
+        } else {
+            fprintf(stderr, "\n\n\t\t\tError creating database: %s\n", mysql_error(conn));
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
+        }
+
+        mysql_close(conn);
+        return 0;
+    } else {
+        fprintf(stderr, "\n\n\t\t\tFailed to connect to MySQL server: %s\n", mysql_error(conn));
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+        mysql_close(conn);
+        return 1;
+    }
+}
+
+int loadDatabase()
+{
+    system("cls");
+    printf("\t\t\t====== Loading of your new database ======\n");
+
+    MYSQL *conn = mysql_init(NULL);
+
+    if (conn == NULL)
+    {
+        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        return EXIT_FAILURE;
+    }
+
+    char dbName[100];
+    printf("\n\n\t\t\tEnter the name of the database to load : ");
+    scanf("%s", dbName);
+
+    if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
+    {
+        printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+
+        // Exécuter des requêtes SQL ici
+        const char *createTableQuery = "CREATE TABLE IF NOT EXISTS exemple_table (id INT PRIMARY KEY, nom VARCHAR(255))";
+        if (mysql_query(conn, createTableQuery) == 0)
+        {
+            printf("\n\n\t\t\tTable created successfully.\n");
+        }
+        else
+        {
+            fprintf(stderr, "\n\n\t\t\tError creating the table : %s\n", mysql_error(conn));
+        }
+
+        mysql_close(conn);
+    }
+    else
+    {
+        fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+    }
+
+    return EXIT_SUCCESS;
+}
 
 
 
