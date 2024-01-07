@@ -1,21 +1,4 @@
-#include "mysql/include/mysql.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <conio.h>
-
-void createAccount();
-int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
-int mainMenu(char *loggedInUsername, char *loggedInPassword);
-// void displayInfo();
-void changeSettings(char *currentUsername, char *currentPassword);
-int testMySQLConnection();
-
-typedef struct Student
-{
-    char studentUsername[50];
-    char studentPassword[20];
-} Student;
+#include "main.h"
 
 int main()
 {
@@ -309,6 +292,51 @@ int createDatabase()
             getch();
         }
 
+        char option;
+
+        while (option != '0')
+        {
+            system("cls");
+            printf("\t\t====== Manager of your database '%s' ======\n", dbName);
+            printf("\n\t\t====== Choose what you want : ======\n");
+            printf("\n\t\t\t1. View existing tables");
+            printf("\n\t\t\t2. Create a table");
+            printf("\n\t\t\t3. Rename a table");
+            printf("\n\t\t\t4. Edit a table");
+            printf("\n\t\t\t5. Delete a table");
+            printf("\n\t\t\t0. Return to previous menu");
+
+            printf("\n\n\n\t\t\tEnter Your Option: ");
+            scanf(" %c", &option);
+            getchar();
+
+            switch (option)
+            {
+            case '1':
+                displayAllTables(conn, dbName);
+                break;
+            case '2':
+                createTable(conn, dbName);
+                break;
+            case '3':
+                renameTable(conn, dbName);
+                break;
+            case '4':
+                editTable(conn, dbName);
+                break;
+            case '5':
+                deleteTable(conn, dbName);
+                break;
+            case '0':
+                printf("\n\t\t\t====== Thank You ======");
+                break;
+            default:
+                printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
+                printf("\n\n\t\t\tEnter any keys to continue.......");
+                getch();
+            }
+        }
+
         mysql_close(conn);
         return 0;
     } else {
@@ -343,7 +371,6 @@ int loadDatabase()
         printf("\n\n\t\t\tEnter any keys to continue.......");
         getch();
 
-        // Exécuter des requêtes SQL ici
         const char *createTableQuery = "CREATE TABLE IF NOT EXISTS exemple_table (id INT PRIMARY KEY, nom VARCHAR(255))";
         if (mysql_query(conn, createTableQuery) == 0)
         {
@@ -352,6 +379,51 @@ int loadDatabase()
         else
         {
             fprintf(stderr, "\n\n\t\t\tError creating the table : %s\n", mysql_error(conn));
+        }
+
+        char option;
+
+        while (option != '0')
+        {
+            system("cls");
+            printf("\t\t====== Manager of your database '%s' ======\n", dbName);
+            printf("\n\t\t====== Choose what you want : ======\n");
+            printf("\n\t\t\t1. View existing tables");
+            printf("\n\t\t\t2. Create a table");
+            printf("\n\t\t\t3. Rename a table");
+            printf("\n\t\t\t4. Edit a table");
+            printf("\n\t\t\t5. Delete a table");
+            printf("\n\t\t\t0. Return to previous menu");
+
+            printf("\n\n\n\t\t\tEnter Your Option: ");
+            scanf(" %c", &option);
+            getchar();
+
+            switch (option)
+            {
+            case '1':
+                displayAllTables(conn, dbName);
+                break;
+            case '2':
+                createTable(conn, dbName);
+                break;
+            case '3':
+                renameTable(conn, dbName);
+                break;
+            case '4':
+                editTable(conn, dbName);
+                break;
+            case '5':
+                deleteTable(conn, dbName);
+                break;
+            case '0':
+                printf("\n\t\t\t====== Thank You ======");
+                break;
+            default:
+                printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
+                printf("\n\n\t\t\tEnter any keys to continue.......");
+                getch();
+            }
         }
 
         mysql_close(conn);
@@ -366,6 +438,154 @@ int loadDatabase()
     return EXIT_SUCCESS;
 }
 
+void displayAllTables(MYSQL *conn, const char *dbName) {
+    if (mysql_select_db(conn, dbName) == 0) {
+        MYSQL_RES *result = mysql_list_tables(conn, NULL);
+
+        if (result != NULL) {
+            MYSQL_ROW row;
+
+            printf("\n\t\t\t====== All Tables in Database '%s' ======\n\n", dbName);
+            while ((row = mysql_fetch_row(result)) != NULL) {
+                printf("\t\t\t%s\n", row[0]);
+            }
+
+            mysql_free_result(result);
+        } else {
+            fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
+        }
+    } else {
+        fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+void createTable(MYSQL *conn, const char *dbName) {
+    char tableName[100];
+    char query[150];
+
+    printf("\n\t\t\tEnter the name of the new table: ");
+    scanf("%s", tableName);
+
+    snprintf(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (id INT PRIMARY KEY, name VARCHAR(255))", tableName);
+
+    if (mysql_query(conn, query) == 0) {
+        printf("\n\n\t\t\tTable '%s' created successfully.\n", tableName);
+    } else {
+        fprintf(stderr, "\n\n\t\t\tError creating table: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+void renameTable(MYSQL *conn, const char *dbName) {
+    char oldTableName[100];
+    char newTableName[100];
+    char query[250];
+
+    printf("\n\t\t\tEnter the current name of the table: ");
+    scanf("%s", oldTableName);
+
+    printf("\n\t\t\tEnter the new name for the table: ");
+    scanf("%s", newTableName);
+
+    snprintf(query, sizeof(query), "RENAME TABLE %s TO %s", oldTableName, newTableName);
+
+    if (mysql_query(conn, query) == 0) {
+        printf("\n\n\t\t\tTable '%s' renamed to '%s' successfully.\n", oldTableName, newTableName);
+    } else {
+        fprintf(stderr, "\n\n\t\t\tError renaming table: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+void editTable(MYSQL *conn, const char *dbName) {
+    char tableName[100];
+    char columnName[100];
+    char columnType[50];
+    char query[250];
+
+    printf("\n\t\t\tEnter the name of the table to modify: ");
+    scanf("%s", tableName);
+
+    printf("\n\t\t\tEnter the name of the new column: ");
+    scanf("%s", columnName);
+
+    printf("\n\t\t\tEnter the data type of the new column: ");
+    scanf("%s", columnType);
+
+    snprintf(query, sizeof(query), "ALTER TABLE %s ADD COLUMN %s %s", tableName, columnName, columnType);
+
+    if (mysql_query(conn, query) == 0) {
+        printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
+
+        void displayTableColumns(conn, dbName, tableName);
+
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
+
+    } else {
+        fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+void deleteTable(MYSQL *conn, const char *dbName) {
+    char tableName[100];
+    char query[150];
+
+    printf("\n\t\t\tEnter the name of the table to delete: ");
+    scanf("%s", tableName);
+
+    snprintf(query, sizeof(query), "DROP TABLE IF EXISTS %s", tableName);
+
+    if (mysql_query(conn, query) == 0) {
+        printf("\n\n\t\t\tTable '%s' deleted successfully.\n", tableName);
+    } else {
+        fprintf(stderr, "\n\n\t\t\tError deleting table: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
+
+void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName) {
+    char query[200];
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+
+    snprintf(query, sizeof(query), "DESCRIBE %s", tableName);
+
+    if (mysql_query(conn, query) == 0) {
+        result = mysql_store_result(conn);
+
+        if (result != NULL) {
+            printf("\n\t\t\t====== Columns of Table '%s' in Database '%s' ======\n", tableName, dbName);
+            printf("\n\t\t%-20s%-20s\n", "Column Name", "Data Type");
+            printf("\t\t----------------------------------------\n");
+
+            while ((row = mysql_fetch_row(result)) != NULL) {
+                printf("\t\t%-20s%-20s\n", row[0], row[1]);
+            }
+
+            mysql_free_result(result);
+        } else {
+            fprintf(stderr, "\n\n\t\t\tError retrieving columns: %s\n", mysql_error(conn));
+        }
+    } else {
+        fprintf(stderr, "\n\n\t\t\tError describing table: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+}
 
 
 
@@ -373,14 +593,7 @@ int loadDatabase()
 
 
 
-
-
-
-
-
-
-
-
+// La fonction 'displayTableColumns' ne fonctionne pas encore, la revoir !!!!
 
 
 
