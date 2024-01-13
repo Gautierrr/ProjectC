@@ -1,5 +1,72 @@
 #include "main.h"
+#include "sdl/include/SDL2/SDL.h"
 
+int SDL_main(int argc, char *argv[]) {
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    char option;
+    int connect = 0;
+    char loggedInUsername[50];
+    char loggedInPassword[20];
+    int result = 0;
+
+    while (option != '0') {
+        SDL_Event event;
+        SDL_PollEvent(&event);
+
+        switch (event.type) {
+            case SDL_QUIT:
+                option = '0';
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    int mouseX = event.button.x;
+                    int mouseY = event.button.y;
+
+                    // Vérifiez quelle option a été cliquée et effectuez l'action appropriée
+                    if (mouseX > 200 && mouseX < 600 && mouseY > 200 && mouseY < 240) {
+                        option = '1';
+                        createAccount();
+                    } else if (mouseX > 200 && mouseX < 600 && mouseY > 250 && mouseY < 290) {
+                        option = '2';
+                        result = authenticateUser(&connect, loggedInUsername, loggedInPassword);
+                    } else if (mouseX > 200 && mouseX < 600 && mouseY > 300 && mouseY < 340) {
+                        option = '3';
+                        if (result == 1) {
+                            mainMenu(loggedInUsername, loggedInPassword);
+                        } else {
+                            // Affichez un message indiquant que l'utilisateur doit être connecté
+                        }
+                        result = 0;
+                    } else if (mouseX > 200 && mouseX < 600 && mouseY > 350 && mouseY < 390) {
+                        option = '0';
+                        printf("\n\t\t\t====== Thank You ======");
+                    }
+                }
+                break;
+        }
+
+        SDL_RenderClear(renderer);
+        // Affichez le menu ici en utilisant SDL_RenderCopy pour chaque option
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;
+}
+
+
+
+
+
+
+/*
 int main()
 {
     char option;
@@ -41,12 +108,12 @@ int main()
             }
             result = 0;
             break;
-        /*case '4':
+     // case '4':
             testMySQLConnection();
             break;
         case '4':
             stateConnect(&connect);
-            break;*/
+            break; //
         case '0':
             printf("\n\t\t\t====== Thank You ======");
             break;
@@ -58,6 +125,7 @@ int main()
     }
     return 0;
 }
+*/
 
 void createAccount()
 {
