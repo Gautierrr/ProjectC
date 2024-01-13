@@ -1,11 +1,23 @@
 #include "main.h"
-#include "sdl/include/SDL2/SDL.h"
 
 int SDL_main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    // Charger les textures pour chaque option du menu
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/image1.png");
+    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/image2.png");
+    SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/image1.png");
+    SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/image2.png");
+
+    // Définir les rectangles pour chaque option
+    SDL_Rect option1Rect = {200, 200, 400, 40};  // x, y, largeur, hauteur
+    SDL_Rect option2Rect = {200, 250, 400, 40};
+    SDL_Rect option3Rect = {200, 300, 400, 40};
+    SDL_Rect option0Rect = {200, 350, 400, 40};
+
 
     char option;
     int connect = 0;
@@ -50,9 +62,21 @@ int SDL_main(int argc, char *argv[]) {
         }
 
         SDL_RenderClear(renderer);
-        // Affichez le menu ici en utilisant SDL_RenderCopy pour chaque option
+
+        // Affichez les textures pour chaque option
+        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+        SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
+        SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
+        SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
+
         SDL_RenderPresent(renderer);
     }
+
+    // Libérez les textures
+    SDL_DestroyTexture(option1Texture);
+    SDL_DestroyTexture(option2Texture);
+    SDL_DestroyTexture(option3Texture);
+    SDL_DestroyTexture(option0Texture);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

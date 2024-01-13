@@ -2,6 +2,8 @@
 #define MAIN_H
 
 #include "mysql/include/mysql.h"
+#include "sdl/include/SDL2/SDL.h"
+#include "sdl/include/SDL2/SDL_image.h"
 #include <stdio.h>
 #include <string.h>
 #include <conio.h>
