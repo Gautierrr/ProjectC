@@ -76,9 +76,9 @@ void createAccount()
 
     printf("\n\t\t\tEnter Student's Username : ");
     getchar();
-    gets(studentInformation.studentUsername);
+    fgets(studentInformation.studentUsername, sizeof(studentInformation.studentUsername), stdin);
     printf("\t\t\tEnter Student's Password : ");
-    gets(studentInformation.studentPassword);
+    fgets(studentInformation.studentPassword, sizeof(studentInformation.studentPassword), stdin);
 
     fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
 
@@ -223,7 +223,7 @@ void changeSettings(char *currentUsername, char *currentPassword)
         printf("\t\t\tEnter your new password: ");
         scanf("%s", currentUser.studentPassword);
 
-        fseek(fp, -sizeof(currentUser), SEEK_CUR);
+        fseek(fp, -((long)sizeof(currentUser)), SEEK_CUR);
         fwrite(&currentUser, sizeof(currentUser), 1, fp);
 
         printf("\n\n\t\t\tUser settings updated successfully!\n");
@@ -524,7 +524,7 @@ void editTable(MYSQL *conn, const char *dbName) {
     if (mysql_query(conn, query) == 0) {
         printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
 
-        void displayTableColumns(conn, dbName, tableName);
+        displayTableColumns(conn, dbName, tableName);
 
         printf("\n\n\t\t\tEnter any keys to continue.......");
         getch();
