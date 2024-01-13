@@ -4,7 +4,11 @@
         "xapi.h": "c",
         "mysql_connection.h": "c",
         "mysql_driver.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "chrono": "c",
+        "functional": "c",
+        "sdl_ttf.h": "c",
+        "sdl.h": "c"
     },
     "sqltools.connections": [
         {

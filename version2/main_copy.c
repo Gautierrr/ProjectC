@@ -1,35 +1,10 @@
 #include "main.h"
 
-SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y)
-{
-    SDL_Color textColor = {255, 255, 255, 255};  // Blanc
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, textColor);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-
-    SDL_Rect textRect = {x, y, textSurface->w, textSurface->h};
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    SDL_FreeSurface(textSurface);
-
-    return textTexture;
-}
-
 int SDL_main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);    
-    
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL initialization failed: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    if (TTF_Init() < 0) {
-        fprintf(stderr, "SDL_ttf initialization failed: %s\n", TTF_GetError());
-        SDL_Quit();
-        return 1;
-    }
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createAnAccount.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/logAccount.png");
@@ -69,11 +44,10 @@ int SDL_main(int argc, char *argv[]) {
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
                         result = authenticateUser(&connect, loggedInUsername, loggedInPassword);
-                        printf("Connect value after authentication: %d\n", connect);
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
-                        if (result == 1) {
+                        if (result == 0) {
                             mainMenu(loggedInUsername, loggedInPassword, renderer, window);
                         } else {
                             printf("\n\n\t\t\tYou must be logged in to access the main menu.");
@@ -106,7 +80,6 @@ int SDL_main(int argc, char *argv[]) {
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    TTF_Quit();
     SDL_Quit();
 
     return 0;
@@ -128,19 +101,16 @@ void createAccount()
     printf("\t\t\t====== Create Student Account ======\n");
 
     printf("\n\t\t\tEnter Student's Username : ");
-    fflush(stdin);
+    getchar();
     fgets(studentInformation.studentUsername, sizeof(studentInformation.studentUsername), stdin);
-    studentInformation.studentUsername[strcspn(studentInformation.studentUsername, "\n")] = '\0';
-
     printf("\t\t\tEnter Student's Password : ");
-    fflush(stdin);
     fgets(studentInformation.studentPassword, sizeof(studentInformation.studentPassword), stdin);
-    studentInformation.studentPassword[strcspn(studentInformation.studentPassword, "\n")] = '\0';
 
     fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
 
     printf("\n\n\t\t\tInformations have been stored sucessfully\n");
     printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
 
     fclose(fp);
 }
@@ -169,108 +139,111 @@ int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPasswor
     printf("\t\t\tEnter your password: ");
     scanf("%s", password);
 
-    printf("\n\t\t\tEntered username: %s\n", username);
-    printf("\t\t\tEntered password: %s\n", password);
+    // printf("\n\t\t\tEntered username: %s\n", username);
+    // printf("\t\t\tEntered password: %s\n", password);
 
     while (fread(&studentInformation, sizeof(studentInformation), 1, fp) == 1) {
+        // printf("\n\t\t\tRead username: %s\n", studentInformation.studentUsername);
+        // printf("\t\t\tRead password: %s\n", studentInformation.studentPassword);
 
-        printf("\n\t\t\tRead username: %s\n", studentInformation.studentUsername);
-        printf("\t\t\tRead password: %s\n", studentInformation.studentPassword);
-
-        if (strcasecmp(username, studentInformation.studentUsername) == 0 && strcmp(password, studentInformation.studentPassword) == 0) {
+        if (strcmp(username, studentInformation.studentUsername) == 0 && strcmp(password, studentInformation.studentPassword) == 0) {
             *connect = 1;
-            printf("\n\n\t\t\tLogin Successful!\n");
 
             strcpy(loggedInUsername, username);
             strcpy(loggedInPassword, password);
 
-            printf("\n\t\t\ttkt: %s\n", loggedInUsername);
-            printf("\t\t\ttkt: %s\n", loggedInPassword);
+            // printf("\n\t\t\ttkt: %s\n", loggedInUsername);
+            // printf("\t\t\ttkt: %s\n", loggedInPassword);
 
-            fclose(fp);
-            return *connect;
+            // fclose(fp);
+            // return 1;
         }
     }
-    printf("\n\n\t\t\tLogin failed. Please try again.\n");
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 
-    *connect = 0;
+    if (*connect == 1){
+        printf("\n\n\t\t\tLogin Successful!\n");
+    } else {
+        printf("\n\n\t\t\tLogin failed. Please try again.\n");
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
+
     fclose(fp);
     return *connect;
 }
 
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer, SDL_Window *window)
 {
-    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createDatabase.png");
-    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/loadDatabase.png");
-    SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/changeSettings.png");
-    SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/testMysql.png");
-    SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
+    /*char option;
 
-    SDL_Rect option1Rect = {200, 100, 400, 40};
-    SDL_Rect option2Rect = {200, 200, 400, 40};
-    SDL_Rect option3Rect = {150, 300, 500, 50};
-    SDL_Rect option4Rect = {150, 400, 500, 50};
-    SDL_Rect option0Rect = {325, 500, 150, 30};
+    while (option != '0')
+    {
+        system("cls");
+        printf("\t\t====== Graphical database generator and manager ======\n");
+        printf("\n\t\t====== Choose what you want : ======\n");
+        printf("\n\t\t\t1. Create a database");
+        printf("\n\t\t\t2. Load a database");
+        printf("\n\t\t\t3. Change my settings");
+        printf("\n\t\t\t4. Know the database connection status");
+        printf("\n\t\t\t0. Sign out");
 
+        printf("\n\n\n\t\t\tEnter Your Option: ");
+        scanf(" %c", &option);
+        getchar();
 
-    char option;
-
-    while (option != '0') {
-        SDL_Event event;
-        SDL_PollEvent(&event);
-
-        switch (event.type) {
-            case SDL_MOUSEBUTTONDOWN:
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    int mouseX = event.button.x;
-                    int mouseY = event.button.y;
-
-                    if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
-                        mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
-                        option = '1';
-                        createDatabase();
-                    } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
-                               mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
-                        option = '2';
-                        loadDatabase();
-                    } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
-                               mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
-                        option = '3';
-                        changeSettings(loggedInUsername, loggedInPassword);
-                    } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
-                               mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
-                        option = '4';
-                        testMySQLConnection(renderer);
-                    } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
-                               mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
-                        option = '0';
-                        return 0;
-                    }
-                }
-                break;
+        switch (option)
+        {
+        case '1':
+            createDatabase();
+            break;
+        case '2':
+            loadDatabase();
+            break;
+        case '3':
+            changeSettings(loggedInUsername, loggedInPassword);
+            break;
+        case '4':
+            testMySQLConnection();
+            break;
+        case '0':
+            printf("\n\t\t\t====== Thank You ======");
+            break;
+        default:
+            printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
         }
+    }*/
 
-        SDL_RenderClear(renderer);
-
-        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
-        SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
-        SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
-        SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
-        SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
-
-        SDL_RenderPresent(renderer);
-    }
-
-    SDL_DestroyTexture(option1Texture);
-    SDL_DestroyTexture(option2Texture);
-    SDL_DestroyTexture(option3Texture);
-    SDL_DestroyTexture(option4Texture);
-    SDL_DestroyTexture(option0Texture);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    SDL_Event event;
+        while (SDL_WaitEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    SDL_DestroyRenderer(renderer);
+                    SDL_DestroyWindow(window);
+                    SDL_Quit();
+                    exit(0);
+                    break;
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_1) {
+                        createDatabase();
+                    } else if (event.key.keysym.sym == SDLK_2) {
+                        loadDatabase();
+                    } else if (event.key.keysym.sym == SDLK_3) {
+                        changeSettings(loggedInUsername, loggedInPassword);
+                    } else if (event.key.keysym.sym == SDLK_4) {
+                        testMySQLConnection();
+                    } else if (event.key.keysym.sym == SDLK_0) {
+                        printf("\n\t\t\t====== Thank You ======");
+                        SDL_DestroyRenderer(renderer);
+                        SDL_DestroyWindow(window);
+                        SDL_Quit();
+                        exit(0);
+                    }
+                    break;
+            }
+        }
 
     return 0;
 }
@@ -322,47 +295,27 @@ void changeSettings(char *currentUsername, char *currentPassword)
     fclose(fp);
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
+    getch();
 }
 
-int testMySQLConnection(SDL_Renderer *renderer) {
-
-    const char *pageTitle = "Testing your connection with the MySql server";
-    const char *success = "Database connection successful !!!  -------  Enter any keys to continue";
-    const char *fail = "Database connection failed...  -------  Enter any keys to continue";
-
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-
+int testMySQLConnection()
+{
     MYSQL *conn = mysql_init(NULL);
 
     if (mysql_real_connect(conn, "localhost", "root", "root", "projetC", 3306, NULL, 0)) {
-        
-        SDL_RenderClear(renderer);
-        
-        renderText(renderer, font, pageTitle, 150, 100);
-        renderText(renderer, font, success, 50, 300);
+        printf("\n\t\t\tDatabase connection successful\n");
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
 
-        SDL_RenderPresent(renderer);
-
-        SDL_Event keyEvent;
-        while (SDL_WaitEvent(&keyEvent) && keyEvent.type != SDL_KEYDOWN) {
-        }
+        // Exécuter des requêtes SQL ici
 
         mysql_close(conn);
     } else {
-        
-        SDL_RenderClear(renderer);
-        
-        renderText(renderer, font, pageTitle, 150, 100);
-        renderText(renderer, font, fail, 50, 300);
-
-        SDL_RenderPresent(renderer);
-
-        SDL_Event keyEvent;
-        while (SDL_WaitEvent(&keyEvent) && keyEvent.type != SDL_KEYDOWN) {
-        }
+        fprintf(stderr, "\n\t\t\tDatabase connection failed: %s\n", mysql_error(conn));
+        printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
     }
 
-    TTF_CloseFont(font);
     return 0;
 }
 
@@ -391,9 +344,11 @@ int createDatabase()
         if (mysql_query(conn, query) == 0) {
             printf("\n\n\t\t\tDatabase '%s' created successfully.\n", dbName);
             printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
         } else {
             fprintf(stderr, "\n\n\t\t\tError creating database: %s\n", mysql_error(conn));
             printf("\n\n\t\t\tEnter any keys to continue.......");
+            getch();
         }
 
         char option;
@@ -437,6 +392,7 @@ int createDatabase()
             default:
                 printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
                 printf("\n\n\t\t\tEnter any keys to continue.......");
+                getch();
             }
         }
 
@@ -445,6 +401,7 @@ int createDatabase()
     } else {
         fprintf(stderr, "\n\n\t\t\tFailed to connect to MySQL server: %s\n", mysql_error(conn));
         printf("\n\n\t\t\tEnter any keys to continue.......");
+        getch();
         mysql_close(conn);
         return 1;
     }
