@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "create_account.h": "c",
+        "connect_account.h": "c",
+        "main_menu.h": "c",
+        "sdl.h": "c",
+        "sdl_ttf.h": "c",
+        "conio.h": "c"
+    }
+}
