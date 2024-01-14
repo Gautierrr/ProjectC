@@ -64,7 +64,7 @@ int SDL_main(int argc, char *argv[]) {
                     if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
                         mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
                         option = '1';
-                        createAccount();
+                        createAccount(renderer);
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
@@ -112,38 +112,152 @@ int SDL_main(int argc, char *argv[]) {
     return 0;
 }
 
-void createAccount()
-{
-    FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
-
-    if (fp == NULL)
-    {
-        printf("\n\t\t\tError !\n");
-    }
-
+void createAccount(SDL_Renderer *renderer) {
     Student studentInformation;
 
-    system("cls");
+    SDL_Surface *blackSurface = SDL_CreateRGBSurface(0, 800, 600, 32, 0, 0, 0, 0);
+    SDL_FillRect(blackSurface, NULL, SDL_MapRGB(blackSurface->format, 0, 0, 0));
 
-    printf("\t\t\t====== Create Student Account ======\n");
+    SDL_Texture *backgroundTexture = SDL_CreateTextureFromSurface(renderer, blackSurface);
 
-    printf("\n\t\t\tEnter Student's Username : ");
-    fflush(stdin);
-    fgets(studentInformation.studentUsername, sizeof(studentInformation.studentUsername), stdin);
-    studentInformation.studentUsername[strcspn(studentInformation.studentUsername, "\n")] = '\0';
+    SDL_FreeSurface(blackSurface);
+    
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    SDL_Color color = {255, 255, 255, 255};
 
-    printf("\t\t\tEnter Student's Password : ");
-    fflush(stdin);
-    fgets(studentInformation.studentPassword, sizeof(studentInformation.studentPassword), stdin);
-    studentInformation.studentPassword[strcspn(studentInformation.studentPassword, "\n")] = '\0';
+    SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
 
-    fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
+    SDL_Surface *surface = TTF_RenderText_Solid(font, "====== Create Student Account ======", color);
+    SDL_Texture *titleTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect titleRect = {250, 50, 300, 30};
+    SDL_RenderCopy(renderer, titleTexture, NULL, &titleRect);
 
-    printf("\n\n\t\t\tInformations have been stored sucessfully\n");
-    printf("\n\n\t\t\tEnter any keys to continue.......");
+    SDL_Surface *usernameSurface = TTF_RenderText_Solid(font, "Enter Student's Username :", color);
+    SDL_Texture *usernameTexture = SDL_CreateTextureFromSurface(renderer, usernameSurface);
+    SDL_Rect usernameRect = {150, 150, 300, 30};
+    SDL_RenderCopy(renderer, usernameTexture, NULL, &usernameRect);
 
-    fclose(fp);
+    SDL_Surface *passwordSurface = TTF_RenderText_Solid(font, "Enter Student's Password :", color);
+    SDL_Texture *passwordTexture = SDL_CreateTextureFromSurface(renderer, passwordSurface);
+    SDL_Rect passwordRect = {150, 250, 300, 30};
+    SDL_RenderCopy(renderer, passwordTexture, NULL, &passwordRect);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    char usernameInput[50];
+    char passwordInput[20];
+    int usernameIndex = 0;
+    int passwordIndex = 0;
+
+    while (1) {
+        // SDL_WaitEvent(&event);
+        SDL_PollEvent(&event);
+
+        switch (event.type) {
+            case SDL_QUIT:
+                SDL_DestroyTexture(backgroundTexture);
+                SDL_DestroyTexture(titleTexture);
+                SDL_DestroyTexture(usernameTexture);
+                SDL_DestroyTexture(passwordTexture);
+                return;
+            case SDL_TEXTINPUT:
+                if (usernameIndex < sizeof(usernameInput) - 1) {
+                    usernameInput[usernameIndex++] = event.text.text[0];
+                }
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_BACKSPACE && usernameIndex > 0) {
+                    usernameInput[--usernameIndex] = '\0';
+                } else if (event.key.keysym.sym == SDLK_RETURN) {
+                    SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+                    SDL_RenderCopy(renderer, titleTexture, NULL, &titleRect);
+                    SDL_RenderCopy(renderer, passwordTexture, NULL, &passwordRect);
+                    SDL_RenderPresent(renderer);
+                    while (1) {
+                        SDL_WaitEvent(&event);
+                        switch (event.type) {
+                            case SDL_QUIT:
+                                SDL_DestroyTexture(backgroundTexture);
+                                SDL_DestroyTexture(titleTexture);
+                                SDL_DestroyTexture(usernameTexture);
+                                SDL_DestroyTexture(passwordTexture);
+                                return;
+                            case SDL_TEXTINPUT:
+                                if (passwordIndex < sizeof(passwordInput) - 1) {
+                                    passwordInput[passwordIndex++] = event.text.text[0];
+                                }
+                                break;
+                            case SDL_KEYDOWN:
+                                if (event.key.keysym.sym == SDLK_BACKSPACE && passwordIndex > 0) {
+                                    passwordInput[--passwordIndex] = '\0';
+                                } else if (event.key.keysym.sym == SDLK_RETURN) {
+                                    strcpy(studentInformation.studentUsername, usernameInput);
+                                    strcpy(studentInformation.studentPassword, passwordInput);
+                                    FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
+                                    if (fp == NULL) {
+                                        printf("\n\t\t\tError !\n");
+                                    }
+                                    fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
+                                    printf("\n\n\t\t\tInformations have been stored successfully\n");
+                                    printf("\n\n\t\t\tEnter any keys to continue.......");
+                                    fclose(fp);
+                                    SDL_DestroyTexture(backgroundTexture);
+                                    SDL_DestroyTexture(titleTexture);
+                                    SDL_DestroyTexture(usernameTexture);
+                                    SDL_DestroyTexture(passwordTexture);
+                                    
+                                    SDL_DestroyRenderer(renderer);
+
+                                    return;
+                                }
+                                break;
+                        }
+                        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+                        SDL_RenderCopy(renderer, titleTexture, NULL, &titleRect);
+                        SDL_RenderCopy(renderer, usernameTexture, NULL, &usernameRect);
+
+                        char maskedPassword[20];
+                        memset(maskedPassword, '*', passwordIndex);
+                        maskedPassword[passwordIndex] = '\0';
+
+                        SDL_Surface *passwordInputSurface = TTF_RenderText_Solid(font, maskedPassword, color);
+                        SDL_DestroyTexture(passwordTexture);
+                        passwordTexture = SDL_CreateTextureFromSurface(renderer, passwordInputSurface);
+                        SDL_Rect passwordInputRect = {150, 250, 80, 30};
+                        SDL_RenderCopy(renderer, passwordTexture, NULL, &passwordInputRect);
+                        SDL_FreeSurface(passwordInputSurface);
+
+                        SDL_RenderPresent(renderer);
+                    }
+                }
+                break;
+        }
+
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        SDL_RenderCopy(renderer, titleTexture, NULL, &titleRect);
+        SDL_Surface *usernameInputSurface = TTF_RenderText_Solid(font, usernameInput, color);
+        SDL_Texture *usernameInputTexture = SDL_CreateTextureFromSurface(renderer, usernameInputSurface);
+        SDL_Rect usernameInputRect = {150, 200, 300, 30};
+        SDL_RenderCopy(renderer, usernameInputTexture, NULL, &usernameInputRect);
+        SDL_FreeSurface(usernameInputSurface);
+
+        SDL_RenderPresent(renderer);
+    }
 }
+
+// #################################################################################################
+// #################################################################################################
+
+
+
+// REVOIR createAccount
+
+
+
+// #################################################################################################
+// #################################################################################################
+
 
 int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword)
 {

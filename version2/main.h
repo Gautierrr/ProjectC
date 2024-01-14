@@ -19,7 +19,10 @@ typedef struct Student
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
 
 
-void createAccount();
+void createAccount(SDL_Renderer *renderer);
+
+
+
 int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 // void displayInfo();
