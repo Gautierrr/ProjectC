@@ -39,7 +39,7 @@ int SDL_main(int argc, char *argv[]) {
     SDL_Rect option1Rect = {200, 100, 400, 40};
     SDL_Rect option2Rect = {200, 200, 400, 40};
     SDL_Rect option3Rect = {150, 300, 500, 50};
-    SDL_Rect option0Rect = {325, 400, 150, 30};
+    SDL_Rect option0Rect = {325, 400, 150, 50};
 
 
     char option;
@@ -74,7 +74,7 @@ int SDL_main(int argc, char *argv[]) {
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
                         if (result == 1) {
-                            mainMenu(loggedInUsername, loggedInPassword, renderer, window);
+                            mainMenu(loggedInUsername, loggedInPassword, renderer);
                         } else {
                             printf("\n\n\t\t\tYou must be logged in to access the main menu.");
                             printf("\n\n\t\t\tEnter any keys to continue.......");
@@ -199,7 +199,7 @@ int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPasswor
     return *connect;
 }
 
-int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer, SDL_Window *window)
+int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer)
 {
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createDatabase.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/loadDatabase.png");
@@ -211,7 +211,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     SDL_Rect option2Rect = {200, 200, 400, 40};
     SDL_Rect option3Rect = {150, 300, 500, 50};
     SDL_Rect option4Rect = {150, 400, 500, 50};
-    SDL_Rect option0Rect = {325, 500, 150, 30};
+    SDL_Rect option0Rect = {325, 500, 150, 50};
 
 
     char option;
@@ -229,11 +229,11 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
                     if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
                         mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
                         option = '1';
-                        createDatabase();
+                        createDatabase(renderer);
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
-                        loadDatabase();
+                        loadDatabase(renderer);
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
@@ -269,7 +269,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     SDL_DestroyTexture(option0Texture);
 
     SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    // SDL_DestroyWindow(window);
     SDL_Quit();
 
     return 0;
@@ -366,8 +366,7 @@ int testMySQLConnection(SDL_Renderer *renderer) {
     return 0;
 }
 
-int createDatabase()
-{
+int createDatabase(SDL_Renderer *renderer) {
     system("cls");
     printf("\t\t\t====== Creation of your new database ======\n");
 
@@ -381,7 +380,7 @@ int createDatabase()
     if (mysql_real_connect(conn, "localhost", "root", "root", NULL, 3306, NULL, 0)) {
         char dbName[100];
         printf("\n\n\t\t\tEnter the name of the new database : ");
-        fgets(dbName, sizeof(dbName), stdin);
+        scanf("%s", dbName);
 
         dbName[strcspn(dbName, "\n")] = '\0';
 
@@ -396,52 +395,11 @@ int createDatabase()
             printf("\n\n\t\t\tEnter any keys to continue.......");
         }
 
-        char option;
-
-        while (option != '0')
-        {
-            system("cls");
-            printf("\t\t====== Manager of your database '%s' ======\n", dbName);
-            printf("\n\t\t====== Choose what you want : ======\n");
-            printf("\n\t\t\t1. View existing tables");
-            printf("\n\t\t\t2. Create a table");
-            printf("\n\t\t\t3. Rename a table");
-            printf("\n\t\t\t4. Edit a table");
-            printf("\n\t\t\t5. Delete a table");
-            printf("\n\t\t\t0. Return to previous menu");
-
-            printf("\n\n\n\t\t\tEnter Your Option: ");
-            scanf(" %c", &option);
-            getchar();
-
-            switch (option)
-            {
-            case '1':
-                displayAllTables(conn, dbName);
-                break;
-            case '2':
-                createTable(conn, dbName);
-                break;
-            case '3':
-                renameTable(conn, dbName);
-                break;
-            case '4':
-                editTable(conn, dbName);
-                break;
-            case '5':
-                deleteTable(conn, dbName);
-                break;
-            case '0':
-                printf("\n\t\t\t====== Thank You ======");
-                break;
-            default:
-                printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
-                printf("\n\n\t\t\tEnter any keys to continue.......");
-            }
-        }
+        databaseMenu(conn, renderer, dbName);
 
         mysql_close(conn);
         return 0;
+
     } else {
         fprintf(stderr, "\n\n\t\t\tFailed to connect to MySQL server: %s\n", mysql_error(conn));
         printf("\n\n\t\t\tEnter any keys to continue.......");
@@ -450,15 +408,13 @@ int createDatabase()
     }
 }
 
-int loadDatabase()
-{
+int loadDatabase(SDL_Renderer *renderer) {
     system("cls");
-    printf("\t\t\t====== Loading of your new database ======\n");
+    printf("\t\t\t====== Loading of your database ======\n");
 
     MYSQL *conn = mysql_init(NULL);
 
-    if (conn == NULL)
-    {
+    if (conn == NULL) {
         fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
         return EXIT_FAILURE;
     }
@@ -471,73 +427,108 @@ int loadDatabase()
     {
         printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
         printf("\n\n\t\t\tEnter any keys to continue.......");
-        getch();
 
-        const char *createTableQuery = "CREATE TABLE IF NOT EXISTS exemple_table (id INT PRIMARY KEY, nom VARCHAR(255))";
+        /*const char *createTableQuery = "CREATE TABLE IF NOT EXISTS exemple_table (id INT PRIMARY KEY, nom VARCHAR(255))";
         if (mysql_query(conn, createTableQuery) == 0)
         {
-            printf("\n\n\t\t\tTable created successfully.\n");
+            printf("\n\n\t\t\tTable loaded successfully.\n");
         }
         else
         {
-            fprintf(stderr, "\n\n\t\t\tError creating the table : %s\n", mysql_error(conn));
-        }
+            fprintf(stderr, "\n\n\t\t\tError loading the table : %s\n", mysql_error(conn));
+        }*/
 
-        char option;
-
-        while (option != '0')
-        {
-            system("cls");
-            printf("\t\t====== Manager of your database '%s' ======\n", dbName);
-            printf("\n\t\t====== Choose what you want : ======\n");
-            printf("\n\t\t\t1. View existing tables");
-            printf("\n\t\t\t2. Create a table");
-            printf("\n\t\t\t3. Rename a table");
-            printf("\n\t\t\t4. Edit a table");
-            printf("\n\t\t\t5. Delete a table");
-            printf("\n\t\t\t0. Return to previous menu");
-
-            printf("\n\n\n\t\t\tEnter Your Option: ");
-            scanf(" %c", &option);
-            getchar();
-
-            switch (option)
-            {
-            case '1':
-                displayAllTables(conn, dbName);
-                break;
-            case '2':
-                createTable(conn, dbName);
-                break;
-            case '3':
-                renameTable(conn, dbName);
-                break;
-            case '4':
-                editTable(conn, dbName);
-                break;
-            case '5':
-                deleteTable(conn, dbName);
-                break;
-            case '0':
-                printf("\n\t\t\t====== Thank You ======");
-                break;
-            default:
-                printf("\n\t\t\tInvalid Option, Please Enter Right Option !\n");
-                printf("\n\n\t\t\tEnter any keys to continue.......");
-                getch();
-            }
-        }
+        databaseMenu(conn, renderer, dbName);
 
         mysql_close(conn);
+        return 0;
     }
     else
     {
         fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
         printf("\n\n\t\t\tEnter any keys to continue.......");
-        getch();
+        mysql_close(conn);
+        return 1;
+    }
+}
+
+void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/viewTables.png");
+    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/createTable.png");
+    SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/renameTable.png");
+    SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/editTable.png");
+    SDL_Texture *option5Texture = IMG_LoadTexture(renderer, "img/deleteTable.png");
+    SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/returnMenu.png");
+
+    SDL_Rect option1Rect = {200, 50, 400, 40};
+    SDL_Rect option2Rect = {200, 150, 400, 40};
+    SDL_Rect option3Rect = {150, 250, 500, 50};
+    SDL_Rect option4Rect = {150, 350, 500, 50};
+    SDL_Rect option5Rect = {150, 450, 500, 50};
+    SDL_Rect option0Rect = {150, 550, 500, 50};
+
+    char option;
+
+    while (option != '0') {
+        SDL_Event event;
+        SDL_PollEvent(&event);
+
+        switch (event.type) {
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    int mouseX = event.button.x;
+                    int mouseY = event.button.y;
+
+                    if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
+                        mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
+                        option = '1';
+                        displayAllTables(conn, dbName);
+                    } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
+                               mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
+                        option = '2';
+                        createTable(conn, dbName);
+                    } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
+                               mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
+                        option = '3';
+                        renameTable(conn, dbName);
+                    } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
+                               mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
+                        option = '4';
+                        editTable(conn, dbName);
+                    } else if (mouseX > option5Rect.x && mouseX < option5Rect.x + option5Rect.w &&
+                               mouseY > option5Rect.y && mouseY < option5Rect.y + option5Rect.h) {
+                        option = '5';
+                        deleteTable(conn, dbName);
+                    } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
+                               mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
+                        option = '0';
+                        return;
+                    }
+                }
+                break;
+        }
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+        SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
+        SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
+        SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
+        SDL_RenderCopy(renderer, option5Texture, NULL, &option5Rect);
+        SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
+
+        SDL_RenderPresent(renderer);
     }
 
-    return EXIT_SUCCESS;
+    SDL_DestroyTexture(option1Texture);
+    SDL_DestroyTexture(option2Texture);
+    SDL_DestroyTexture(option3Texture);
+    SDL_DestroyTexture(option4Texture);
+    SDL_DestroyTexture(option5Texture);
+    SDL_DestroyTexture(option0Texture);
+
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
 }
 
 void displayAllTables(MYSQL *conn, const char *dbName) {
@@ -561,7 +552,6 @@ void displayAllTables(MYSQL *conn, const char *dbName) {
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 void createTable(MYSQL *conn, const char *dbName) {
@@ -580,7 +570,6 @@ void createTable(MYSQL *conn, const char *dbName) {
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 void renameTable(MYSQL *conn, const char *dbName) {
@@ -603,7 +592,6 @@ void renameTable(MYSQL *conn, const char *dbName) {
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 void editTable(MYSQL *conn, const char *dbName) {
@@ -636,7 +624,6 @@ void editTable(MYSQL *conn, const char *dbName) {
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 void deleteTable(MYSQL *conn, const char *dbName) {
@@ -655,7 +642,6 @@ void deleteTable(MYSQL *conn, const char *dbName) {
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName) {
@@ -686,7 +672,6 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName)
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");
-    getch();
 }
 
 

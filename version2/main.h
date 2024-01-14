@@ -21,7 +21,7 @@ SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text
 
 void createAccount();
 int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
-int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer, SDL_Window *window);
+int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 // void displayInfo();
 void changeSettings(char *currentUsername, char *currentPassword);
 int testMySQLConnection(SDL_Renderer *renderer);
@@ -32,8 +32,10 @@ void editTable(MYSQL *conn, const char *dbName);
 void deleteTable(MYSQL *conn, const char *dbName);
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName);
 
-int createDatabase();
-int loadDatabase();
+int createDatabase(SDL_Renderer *renderer);
+int loadDatabase(SDL_Renderer *renderer);
+
+void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
 
 
 
