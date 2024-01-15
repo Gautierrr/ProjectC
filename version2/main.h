@@ -18,16 +18,24 @@ typedef struct Student
 
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
 
-
-void createAccount(SDL_Renderer *renderer, SDL_Window *window);
-
-
-
-
-int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword);
+// Graphique fait
+void createAccount(SDL_Renderer *renderer);
+int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
-// void displayInfo();
-void changeSettings(char *currentUsername, char *currentPassword);
+void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
+
+
+
+
+
+
+
+
+
+
+
+
+// Terminal
 int testMySQLConnection(SDL_Renderer *renderer);
 void displayAllTables(MYSQL *conn, const char *dbName);
 void createTable(MYSQL *conn, const char *dbName);
