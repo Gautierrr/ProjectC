@@ -8,7 +8,8 @@
         "chrono": "c",
         "functional": "c",
         "sdl_ttf.h": "c",
-        "sdl.h": "c"
+        "sdl.h": "c",
+        "imgui_impl_sdl2.h": "c"
     },
     "sqltools.connections": [
         {

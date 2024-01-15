@@ -19,7 +19,8 @@ typedef struct Student
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
 
 
-void createAccount(SDL_Renderer *renderer);
+void createAccount(SDL_Renderer *renderer, SDL_Window *window);
+
 
 
 
