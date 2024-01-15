@@ -465,14 +465,14 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     SDL_Color textColor = { 255, 255, 255 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
     // SDL_Color color = {255, 255, 255, 255};
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Username:", textColor);
+    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Username:", textColor);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
     textRect.y = 60;
 
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Password:", textColor);
+    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Password:", textColor);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
@@ -593,9 +593,6 @@ int testMySQLConnection(SDL_Renderer *renderer) {
 }
 
 int createDatabase(SDL_Renderer *renderer) {
-    system("cls");
-    printf("\t\t\t====== Creation of your new database ======\n");
-
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
@@ -604,9 +601,70 @@ int createDatabase(SDL_Renderer *renderer) {
     }
 
     if (mysql_real_connect(conn, "localhost", "root", "root", NULL, 3306, NULL, 0)) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_Rect databaseRect = { 50, 200, 200, 30 };
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &databaseRect);
+
+        SDL_Rect textRect = { 50, 100, 300, 30 };
+
+        SDL_Surface *textSurface;
+        SDL_Texture *textTexture;
+        SDL_Color textColor = { 255, 255, 255 };
+        TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+        textSurface = TTF_RenderText_Solid(font, "Enter Database name : ", textColor);
+        textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        SDL_FreeSurface(textSurface);
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+        SDL_RenderPresent(renderer);
+
+        SDL_Event event;
+
+        int done = 0;
+        int isTypingUsername = 1;
         char dbName[100];
-        printf("\n\n\t\t\tEnter the name of the new database : ");
-        scanf("%s", dbName);
+
+        // Initialiser les chaînes de caractères à zéro
+        memset(dbName, 0, sizeof(dbName));
+
+        while (!done) {
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    done = 1;
+                } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
+                    done = 1;
+                } else if (event.type == SDL_KEYDOWN) {
+                    if (event.key.keysym.sym == SDLK_RETURN) {
+                        if (isTypingUsername) {
+                            isTypingUsername = 0;
+                            // SDL_StartTextInput();
+                        } else {
+                            // SDL_StopTextInput();
+                            done = 1;
+                        }
+                    }
+                } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
+                    strcat(dbName, event.text.text);
+
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                    SDL_RenderFillRect(renderer, &databaseRect);
+
+                    textSurface = TTF_RenderText_Solid(font, dbName, textColor);
+                    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                    SDL_FreeSurface(textSurface);
+                    SDL_RenderCopy(renderer, textTexture, NULL, &databaseRect);
+
+                    SDL_RenderPresent(renderer);
+                }
+            }
+
+            SDL_Delay(10);
+        }
 
         dbName[strcspn(dbName, "\n")] = '\0';
 
@@ -635,9 +693,6 @@ int createDatabase(SDL_Renderer *renderer) {
 }
 
 int loadDatabase(SDL_Renderer *renderer) {
-    system("cls");
-    printf("\t\t\t====== Loading of your database ======\n");
-
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
@@ -645,9 +700,69 @@ int loadDatabase(SDL_Renderer *renderer) {
         return EXIT_FAILURE;
     }
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_Rect databaseRect = { 50, 200, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &databaseRect);
+
+    SDL_Rect textRect = { 50, 100, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    textSurface = TTF_RenderText_Solid(font, "Enter the name of the database to load : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingUsername = 1;
     char dbName[100];
-    printf("\n\n\t\t\tEnter the name of the database to load : ");
-    scanf("%s", dbName);
+
+    // Initialiser les chaînes de caractères à zéro
+    memset(dbName, 0, sizeof(dbName));
+
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (isTypingUsername) {
+                        isTypingUsername = 0;
+                        // SDL_StartTextInput();
+                    } else {
+                        // SDL_StopTextInput();
+                        done = 1;
+                    }
+                }
+            } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
+                strcat(dbName, event.text.text);
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &databaseRect);
+
+                textSurface = TTF_RenderText_Solid(font, dbName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &databaseRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
 
     if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
     {
@@ -712,19 +827,19 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
-                        createTable(conn, dbName);
+                        createTable(conn, dbName, renderer);
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
-                        renameTable(conn, dbName);
+                        renameTable(conn, dbName, renderer);
                     } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
                                mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
                         option = '4';
-                        editTable(conn, dbName);
+                        editTable(conn, dbName, renderer);
                     } else if (mouseX > option5Rect.x && mouseX < option5Rect.x + option5Rect.w &&
                                mouseY > option5Rect.y && mouseY < option5Rect.y + option5Rect.h) {
                         option = '5';
-                        deleteTable(conn, dbName);
+                        deleteTable(conn, dbName, renderer);
                     } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
@@ -757,6 +872,62 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
     SDL_Quit();
 }
 
+/*
+void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+    char query[1000];
+    sprintf(query, "SHOW TABLES FROM %s", dbName);
+
+    if (mysql_query(conn, query) == 0) {
+        MYSQL_RES *result = mysql_store_result(conn);
+
+        if (result != NULL) {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+            SDL_Color textColor = { 255, 255, 255 };
+            TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+
+            SDL_Rect textRect = { 50, 100, 300, 30 };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &textRect);
+
+            printf("\n\t\t\t====== All Tables in Database '%s' ======\n\n", dbName);
+
+            MYSQL_ROW row;
+
+            int yOffset = 0;
+            while ((row = mysql_fetch_row(result)) != NULL) {
+                textRect.y = 100 + yOffset;
+                SDL_Surface *textSurface = TTF_RenderText_Solid(font, row[0], textColor);
+                SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+                SDL_DestroyTexture(textTexture);
+
+                printf("\t\t\t%s\n", row[0]);
+
+                yOffset += 30;
+            }
+
+            SDL_RenderPresent(renderer);
+
+            mysql_free_result(result);
+        } else {
+            fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
+        }
+    } else {
+        fprintf(stderr, "\n\t\t\tFailed to execute query: %s\n", mysql_error(conn));
+    }
+
+    printf("\n\n\t\t\tEnter any keys to continue.......");
+}
+
+// displayAllTables ne fonctionne pas ...
+*/
+
 void displayAllTables(MYSQL *conn, const char *dbName) {
     if (mysql_select_db(conn, dbName) == 0) {
         MYSQL_RES *result = mysql_list_tables(conn, NULL);
@@ -780,12 +951,72 @@ void displayAllTables(MYSQL *conn, const char *dbName) {
     printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
-void createTable(MYSQL *conn, const char *dbName) {
+void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_Rect tableRect = { 50, 200, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &tableRect);
+
+    SDL_Rect textRect = { 50, 100, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    textSurface = TTF_RenderText_Solid(font, "Enter the name of the new table : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingUsername = 1;
     char tableName[100];
     char query[150];
 
-    printf("\n\t\t\tEnter the name of the new table: ");
-    scanf("%s", tableName);
+    // Initialiser les chaînes de caractères à zéro
+    memset(tableName, 0, sizeof(tableName));
+
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (isTypingUsername) {
+                        isTypingUsername = 0;
+                        // SDL_StartTextInput();
+                    } else {
+                        // SDL_StopTextInput();
+                        done = 1;
+                    }
+                }
+            } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
+                strcat(tableName, event.text.text);
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &tableRect);
+
+                textSurface = TTF_RenderText_Solid(font, tableName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &tableRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
 
     snprintf(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (id INT PRIMARY KEY, name VARCHAR(255))", tableName);
 
@@ -798,17 +1029,96 @@ void createTable(MYSQL *conn, const char *dbName) {
     printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
-void renameTable(MYSQL *conn, const char *dbName) {
+void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+    Student studentInformation;
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_Rect oldTableRect = { 50, 100, 200, 30 };
+    SDL_Rect newTableRect = { 50, 350, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &oldTableRect);
+    SDL_RenderFillRect(renderer, &newTableRect);
+
+    SDL_Rect textRect = { 50, 60, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    // SDL_Color color = {255, 255, 255, 255};
+    textSurface = TTF_RenderText_Solid(font, "Enter the current name of the table : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    textRect.y = 300;
+
+    textSurface = TTF_RenderText_Solid(font, "Enter the new name for the table : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingUsername = 1;
     char oldTableName[100];
     char newTableName[100];
     char query[250];
 
-    printf("\n\t\t\tEnter the current name of the table: ");
-    scanf("%s", oldTableName);
+    // Initialiser les chaînes de caractères à zéro
+    memset(oldTableName, 0, sizeof(oldTableName));
+    memset(newTableName, 0, sizeof(newTableName));
 
-    printf("\n\t\t\tEnter the new name for the table: ");
-    scanf("%s", newTableName);
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (isTypingUsername) {
+                        isTypingUsername = 0;
+                        // SDL_StartTextInput();
+                    } else {
+                        // SDL_StopTextInput();
+                        done = 1;
+                    }
+                }
+            } else if (event.type == SDL_TEXTINPUT) {
+                if (isTypingUsername) {
+                    strcat(oldTableName, event.text.text);
+                } else {
+                    strcat(newTableName, event.text.text);
+                }
 
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &oldTableRect);
+                SDL_RenderFillRect(renderer, &newTableRect);
+
+                textSurface = TTF_RenderText_Solid(font, oldTableName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &oldTableRect);
+                
+                textSurface = TTF_RenderText_Solid(font, newTableName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &newTableRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
+    
     snprintf(query, sizeof(query), "RENAME TABLE %s TO %s", oldTableName, newTableName);
 
     if (mysql_query(conn, query) == 0) {
@@ -820,7 +1130,7 @@ void renameTable(MYSQL *conn, const char *dbName) {
     printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
-void editTable(MYSQL *conn, const char *dbName) {
+void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     char tableName[100];
     char columnName[100];
     char columnType[50];
@@ -852,12 +1162,72 @@ void editTable(MYSQL *conn, const char *dbName) {
     printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
-void deleteTable(MYSQL *conn, const char *dbName) {
+void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_Rect tableRect = { 50, 200, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &tableRect);
+
+    SDL_Rect textRect = { 50, 100, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    textSurface = TTF_RenderText_Solid(font, "Enter the name of the table to delete : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingUsername = 1;
     char tableName[100];
     char query[150];
 
-    printf("\n\t\t\tEnter the name of the table to delete: ");
-    scanf("%s", tableName);
+    // Initialiser les chaînes de caractères à zéro
+    memset(tableName, 0, sizeof(tableName));
+
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (isTypingUsername) {
+                        isTypingUsername = 0;
+                        // SDL_StartTextInput();
+                    } else {
+                        // SDL_StopTextInput();
+                        done = 1;
+                    }
+                }
+            } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
+                strcat(tableName, event.text.text);
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &tableRect);
+
+                textSurface = TTF_RenderText_Solid(font, tableName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &tableRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
 
     snprintf(query, sizeof(query), "DROP TABLE IF EXISTS %s", tableName);
 

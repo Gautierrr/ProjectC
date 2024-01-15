@@ -313,20 +313,6 @@ int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPasswor
         SDL_Delay(10);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     FILE *fp = fopen("bdd/studentInfo.bin", "rb");
 
     if (fp == NULL)
@@ -399,7 +385,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
-                        changeSettings(loggedInUsername, loggedInPassword);
+                        changeSettings(loggedInUsername, loggedInPassword, renderer);
                     } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
                                mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
                         option = '4';
@@ -437,47 +423,125 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     return 0;
 }
 
-void changeSettings(char *currentUsername, char *currentPassword)
+void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer)
 {
+    Student currentUser;
+
     FILE *fp = fopen("bdd/studentInfo.bin", "rb+");
 
     if (fp == NULL)
     {
-        printf("\n\t\t\tError !\n");
+        printf("\n\t\t\tError opening file!\n");
         return;
     }
-
-    Student currentUser;
-
-    system("cls");
-    printf("\t\t\t====== Change User Settings ======\n");
 
     int found = 0;
 
     while (fread(&currentUser, sizeof(currentUser), 1, fp) == 1)
     {
-        if (strcmp(currentUsername, currentUser.studentUsername) == 0 && strcmp(currentPassword, currentUser.studentPassword) == 0)
-        {
+        if (strcmp(currentUsername, currentUser.studentUsername) == 0 &&
+            strcmp(currentPassword, currentUser.studentPassword) == 0) {
             found = 1;
             break;
         }
     }
 
-    if (found)
-    {
-        printf("\n\t\t\tEnter your new username: ");
-        scanf("%s", currentUser.studentUsername);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
 
-        printf("\t\t\tEnter your new password: ");
-        scanf("%s", currentUser.studentPassword);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+    SDL_Rect usernameRect = { 50, 100, 200, 30 };
+    SDL_Rect passwordRect = { 50, 350, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &usernameRect);
+    SDL_RenderFillRect(renderer, &passwordRect);
+
+    SDL_Rect textRect = { 50, 300, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    // SDL_Color color = {255, 255, 255, 255};
+    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Username:", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    textRect.y = 60;
+
+    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Password:", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingUsername = 1;
+
+    // Initialiser les chaînes de caractères à zéro
+    memset(currentUser.studentUsername, 0, sizeof(currentUser.studentUsername));
+    memset(currentUser.studentPassword, 0, sizeof(currentUser.studentPassword));
+
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                    if (isTypingUsername) {
+                        isTypingUsername = 0;
+                        // SDL_StartTextInput();
+                    } else {
+                        // SDL_StopTextInput();
+                        done = 1;
+                    }
+                }
+            } else if (event.type == SDL_TEXTINPUT) {
+                if (isTypingUsername) {
+                    strcat(currentUser.studentUsername, event.text.text);
+                } else {
+                    strcat(currentUser.studentPassword, event.text.text);
+                }
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &usernameRect);
+                SDL_RenderFillRect(renderer, &passwordRect);
+
+                textSurface = TTF_RenderText_Solid(font, currentUser.studentUsername, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
+
+                // Afficher des étoiles pour le mot de passe
+                size_t passwordLength = strlen(currentUser.studentPassword);
+                char maskedPassword[passwordLength + 1];
+                memset(maskedPassword, '*', passwordLength);
+                maskedPassword[passwordLength] = '\0';
+                
+                textSurface = TTF_RenderText_Solid(font, maskedPassword, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &passwordRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
+
+    if (found) {
         fseek(fp, -((long)sizeof(currentUser)), SEEK_CUR);
         fwrite(&currentUser, sizeof(currentUser), 1, fp);
 
         printf("\n\n\t\t\tUser settings updated successfully!\n");
-    }
-    else
-    {
+    } else {
         printf("\n\n\t\t\tUser not found. Please check your current username and password.\n");
     }
 
@@ -529,9 +593,6 @@ int testMySQLConnection(SDL_Renderer *renderer) {
 }
 
 int createDatabase(SDL_Renderer *renderer) {
-    system("cls");
-    printf("\t\t\t====== Creation of your new database ======\n");
-
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
@@ -540,9 +601,70 @@ int createDatabase(SDL_Renderer *renderer) {
     }
 
     if (mysql_real_connect(conn, "localhost", "root", "root", NULL, 3306, NULL, 0)) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_Rect databaseRect = { 50, 200, 200, 30 };
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &databaseRect);
+
+        SDL_Rect textRect = { 50, 100, 300, 30 };
+
+        SDL_Surface *textSurface;
+        SDL_Texture *textTexture;
+        SDL_Color textColor = { 255, 255, 255 };
+        TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+        textSurface = TTF_RenderText_Solid(font, "Enter Database name:", textColor);
+        textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        SDL_FreeSurface(textSurface);
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+        SDL_RenderPresent(renderer);
+
+        SDL_Event event;
+
+        int done = 0;
+        int isTypingUsername = 1;
         char dbName[100];
-        printf("\n\n\t\t\tEnter the name of the new database : ");
-        scanf("%s", dbName);
+
+        // Initialiser les chaînes de caractères à zéro
+        memset(dbName, 0, sizeof(dbName));
+
+        while (!done) {
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    done = 1;
+                } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
+                    done = 1;
+                } else if (event.type == SDL_KEYDOWN) {
+                    if (event.key.keysym.sym == SDLK_RETURN) {
+                        if (isTypingUsername) {
+                            isTypingUsername = 0;
+                            // SDL_StartTextInput();
+                        } else {
+                            // SDL_StopTextInput();
+                            done = 1;
+                        }
+                    }
+                } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
+                    strcat(dbName, event.text.text);
+
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                    SDL_RenderFillRect(renderer, &databaseRect);
+
+                    textSurface = TTF_RenderText_Solid(font, dbName, textColor);
+                    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                    SDL_FreeSurface(textSurface);
+                    SDL_RenderCopy(renderer, textTexture, NULL, &databaseRect);
+
+                    SDL_RenderPresent(renderer);
+                }
+            }
+
+            SDL_Delay(10);
+        }
 
         dbName[strcspn(dbName, "\n")] = '\0';
 

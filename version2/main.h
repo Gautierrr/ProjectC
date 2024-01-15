@@ -18,42 +18,34 @@ typedef struct Student
 
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
 
-// Graphique fait
+
+// Graphique fait  ->  mais esthétique à faire !!!
 void createAccount(SDL_Renderer *renderer);
 int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
+int testMySQLConnection(SDL_Renderer *renderer);
+int createDatabase(SDL_Renderer *renderer);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
+int loadDatabase(SDL_Renderer *renderer);               // comme ca identification de qui peux modifier tel et tel bdd
+void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
+// displayAllTables
+void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+// editTable
+void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+// displayTableColumns
 
 
 
-
-
-
-
-
-
+// ##########           Voir pour le MCD     #################
 
 
 
 // Terminal
-int testMySQLConnection(SDL_Renderer *renderer);
-void displayAllTables(MYSQL *conn, const char *dbName);
-void createTable(MYSQL *conn, const char *dbName);
-void renameTable(MYSQL *conn, const char *dbName);
-void editTable(MYSQL *conn, const char *dbName);
-void deleteTable(MYSQL *conn, const char *dbName);
-void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName);
 
-int createDatabase(SDL_Renderer *renderer);
-int loadDatabase(SDL_Renderer *renderer);
-
-void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
-
-
-
-
-
-
+void displayAllTables(MYSQL *conn, const char *dbName); // displayAllTables ne fonctionnes pas ...
+void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer); // a faire
+void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName); // a faire
 
 
 #endif
