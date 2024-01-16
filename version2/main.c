@@ -823,7 +823,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
                     if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
                         mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
                         option = '1';
-                        displayAllTables(conn, dbName);
+                        displayAllTables(conn, dbName, renderer);
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
@@ -872,73 +872,62 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
     SDL_Quit();
 }
 
-/*
 void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
-    char query[1000];
-    sprintf(query, "SHOW TABLES FROM %s", dbName);
-
-    if (mysql_query(conn, query) == 0) {
-        MYSQL_RES *result = mysql_store_result(conn);
-
-        if (result != NULL) {
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
-
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-            SDL_Color textColor = { 255, 255, 255 };
-            TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-
-            SDL_Rect textRect = { 50, 100, 300, 30 };
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderFillRect(renderer, &textRect);
-
-            printf("\n\t\t\t====== All Tables in Database '%s' ======\n\n", dbName);
-
-            MYSQL_ROW row;
-
-            int yOffset = 0;
-            while ((row = mysql_fetch_row(result)) != NULL) {
-                textRect.y = 100 + yOffset;
-                SDL_Surface *textSurface = TTF_RenderText_Solid(font, row[0], textColor);
-                SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-                SDL_DestroyTexture(textTexture);
-
-                printf("\t\t\t%s\n", row[0]);
-
-                yOffset += 30;
-            }
-
-            SDL_RenderPresent(renderer);
-
-            mysql_free_result(result);
-        } else {
-            fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
-        }
-    } else {
-        fprintf(stderr, "\n\t\t\tFailed to execute query: %s\n", mysql_error(conn));
-    }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
-}
-
-// displayAllTables ne fonctionne pas ...
-*/
-
-void displayAllTables(MYSQL *conn, const char *dbName) {
     if (mysql_select_db(conn, dbName) == 0) {
         MYSQL_RES *result = mysql_list_tables(conn, NULL);
 
         if (result != NULL) {
+            SDL_Window *window;
+            SDL_CreateWindowAndRenderer(800, 600, 0, &window, &renderer);
+
+            TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+            SDL_Color textColor = { 255, 255, 255 };
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+
+            SDL_Rect textRect = { 50, 60, 300, 30 };
+
+            SDL_Surface *textSurface;
+            SDL_Texture *textTexture;
+
+            textSurface = TTF_RenderText_Solid(font, "All Tables in Database", textColor);
+            textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+            SDL_RenderPresent(renderer);
+
+            textRect.y += 40;
+
             MYSQL_ROW row;
 
-            printf("\n\t\t\t====== All Tables in Database '%s' ======\n\n", dbName);
             while ((row = mysql_fetch_row(result)) != NULL) {
-                printf("\t\t\t%s\n", row[0]);
+                textSurface = TTF_RenderText_Solid(font, row[0], textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+                SDL_RenderPresent(renderer);
+
+                textRect.y += 40;
             }
+
+            int quit = 0;
+            SDL_Event event;
+
+            while (!quit) {
+                while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                        quit = 1;
+                    }
+                }
+                SDL_Delay(10);
+            }
+
+            SDL_DestroyTexture(textTexture);
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
 
             mysql_free_result(result);
         } else {
@@ -947,8 +936,6 @@ void displayAllTables(MYSQL *conn, const char *dbName) {
     } else {
         fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
     }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
@@ -1030,8 +1017,6 @@ void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 }
 
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
-    Student studentInformation;
-
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
@@ -1131,30 +1116,123 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 }
 
 void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_Rect tableNameRect = { 50, 100, 200, 30 };
+    SDL_Rect columnNameRect = { 50, 250, 200, 30 };
+    SDL_Rect columnTypeRect = { 50, 400, 200, 30 };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &tableNameRect);
+    SDL_RenderFillRect(renderer, &columnNameRect);
+    SDL_RenderFillRect(renderer, &columnTypeRect);
+
+    SDL_Rect textRect = { 50, 60, 300, 30 };
+
+    SDL_Surface *textSurface;
+    SDL_Texture *textTexture;
+    SDL_Color textColor = { 255, 255, 255 };
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    // SDL_Color color = {255, 255, 255, 255};
+    textSurface = TTF_RenderText_Solid(font, "Enter the name of the table to modify : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    textRect.y = 200;
+
+    textSurface = TTF_RenderText_Solid(font, "Enter the name of the new column : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    textRect.y = 360;
+
+    textSurface = TTF_RenderText_Solid(font, "Enter the data type of the new column : ", textColor);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+
+    int done = 0;
+    int isTypingTableName = 1;
+    int isTypingColumnName = 0;
+    int isTypingTypeName = 0;
     char tableName[100];
     char columnName[100];
     char columnType[50];
     char query[250];
 
-    printf("\n\t\t\tEnter the name of the table to modify: ");
-    scanf("%s", tableName);
+    // Initialiser les chaînes de caractères à zéro
+    memset(tableName, 0, sizeof(tableName));
+    memset(columnName, 0, sizeof(columnName));
+    memset(columnType, 0, sizeof(columnType));
 
-    printf("\n\t\t\tEnter the name of the new column: ");
-    scanf("%s", columnName);
+    while (!done) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                done = 1;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN) {
+                if (isTypingTableName) {
+                    isTypingTableName = 0;
+                    isTypingColumnName = 1;
+                } else if (isTypingColumnName) {
+                    isTypingColumnName = 0;
+                    isTypingTypeName = 1;
+                } else if (isTypingTypeName) {
+                    isTypingTypeName = 1;
+                    done = 1;
+                }
+                }
+            } else if (event.type == SDL_TEXTINPUT) {
+                if (isTypingTableName) {
+                    strcat(tableName, event.text.text);
+                } else if (isTypingColumnName) {  // Fix: use isTypingColumnName
+                    strcat(columnName, event.text.text);
+                } else if (isTypingTypeName) {
+                    strcat(columnType, event.text.text);
+                }
 
-    printf("\n\t\t\tEnter the data type of the new column: ");
-    scanf("%s", columnType);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer, &tableNameRect);
+                SDL_RenderFillRect(renderer, &columnNameRect);
+                SDL_RenderFillRect(renderer, &columnTypeRect);
+
+                textSurface = TTF_RenderText_Solid(font, tableName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &tableNameRect);
+                
+                textSurface = TTF_RenderText_Solid(font, columnName, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &columnNameRect);
+                
+                textSurface = TTF_RenderText_Solid(font, columnType, textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &columnTypeRect);
+
+                SDL_RenderPresent(renderer);
+            }
+        }
+
+        SDL_Delay(10);
+    }
 
     snprintf(query, sizeof(query), "ALTER TABLE %s ADD COLUMN %s %s", tableName, columnName, columnType);
 
     if (mysql_query(conn, query) == 0) {
         printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
 
-        displayTableColumns(conn, dbName, tableName);
-
-        printf("\n\n\t\t\tEnter any keys to continue.......");
-        getch();
-
+        displayTableColumns(conn, dbName, tableName, renderer);
     } else {
         fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
     }
@@ -1240,7 +1318,7 @@ void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
-void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName) {
+void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer) {
     char query[200];
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -1251,13 +1329,81 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName)
         result = mysql_store_result(conn);
 
         if (result != NULL) {
-            printf("\n\t\t\t====== Columns of Table '%s' in Database '%s' ======\n", tableName, dbName);
-            printf("\n\t\t%-20s%-20s\n", "Column Name", "Data Type");
-            printf("\t\t----------------------------------------\n");
+            // Fenêtre SDL
+            SDL_Window *window;
+            SDL_CreateWindowAndRenderer(1000, 700, 0, &window, &renderer);
+
+            // Police SDL_ttf
+            TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+            SDL_Color textColor = { 255, 255, 255 };
+
+            // Affichage dans la fenêtre SDL
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+
+            SDL_Rect textRect = { 50, 60, 100, 30 };
+
+            SDL_Surface *textSurface;
+            SDL_Texture *textTexture;
+
+            textSurface = TTF_RenderText_Solid(font, "Columns of Table", textColor);
+            textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+            textRect.y += 40;
+
+            textSurface = TTF_RenderText_Solid(font, "Column Name", textColor);
+            textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+            textRect.x += 200;
+
+            textSurface = TTF_RenderText_Solid(font, "Data Type", textColor);
+            textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            SDL_FreeSurface(textSurface);
+            SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+            SDL_RenderPresent(renderer);
+
+            textRect.y += 40;
 
             while ((row = mysql_fetch_row(result)) != NULL) {
-                printf("\t\t%-20s%-20s\n", row[0], row[1]);
+                textRect.x = 50;
+
+                textSurface = TTF_RenderText_Solid(font, row[0], textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+                textRect.x += 200;
+
+                textSurface = TTF_RenderText_Solid(font, row[1], textColor);
+                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                SDL_FreeSurface(textSurface);
+                SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+                SDL_RenderPresent(renderer);
+
+                textRect.y += 40;
             }
+
+            int quit = 0;
+            SDL_Event event;
+
+            while (!quit) {
+                while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                        quit = 1;
+                    }
+                }
+                SDL_Delay(10);
+            }
+
+            SDL_DestroyTexture(textTexture);
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
 
             mysql_free_result(result);
         } else {
@@ -1266,17 +1412,10 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName)
     } else {
         fprintf(stderr, "\n\n\t\t\tError describing table: %s\n", mysql_error(conn));
     }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }
 
 
 
-
-
-
-
-// La fonction 'displayTableColumns' ne fonctionne pas encore, la revoir !!!!
 
 
 

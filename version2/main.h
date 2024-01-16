@@ -28,24 +28,20 @@ int testMySQLConnection(SDL_Renderer *renderer);
 int createDatabase(SDL_Renderer *renderer);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
 int loadDatabase(SDL_Renderer *renderer);               // comme ca identification de qui peux modifier tel et tel bdd
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
-// displayAllTables
+void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-// editTable
+void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-// displayTableColumns
+void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 
-// ##########           Voir pour le MCD     #################
-
-
-
-// Terminal
-
-void displayAllTables(MYSQL *conn, const char *dbName); // displayAllTables ne fonctionnes pas ...
-void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer); // a faire
-void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName); // a faire
+// ########################################################################
+// #################                                      #################
+// #################           Voir pour le MCD           #################
+// #################                                      #################
+// ########################################################################
 
 
 #endif
