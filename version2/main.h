@@ -17,12 +17,11 @@ typedef struct Student
 
 typedef struct {
     char name[100];
-    int x, y; // Position sur l'écran
+    int x, y;
 } Table;
 
-// Structure pour représenter un lien entre deux tables
 typedef struct {
-    int tableIndex1, tableIndex2; // Indices des tables liées
+    int tableIndex1, tableIndex2;
 } Link;
 
 typedef struct {
@@ -39,7 +38,7 @@ SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text
 
 // Graphique fait  ->  mais esthétique à faire !!!
 void createAccount(SDL_Renderer *renderer);
-int authenticateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
+int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
 int testMySQLConnection(SDL_Renderer *renderer);
