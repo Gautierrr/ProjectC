@@ -15,6 +15,24 @@ typedef struct Student
     char studentPassword[20];
 } Student;
 
+typedef struct {
+    char name[100];
+    int x, y; // Position sur l'écran
+} Table;
+
+// Structure pour représenter un lien entre deux tables
+typedef struct {
+    int tableIndex1, tableIndex2; // Indices des tables liées
+} Link;
+
+typedef struct {
+    char sourceTable[50];
+    char sourceColumn[50];
+    char targetTable[50];
+    char targetColumn[50];
+} ForeignKey;
+
+
 
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
 
@@ -29,6 +47,7 @@ int createDatabase(SDL_Renderer *renderer);             // pour savoir a qui app
 int loadDatabase(SDL_Renderer *renderer);               // comme ca identification de qui peux modifier tel et tel bdd
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
 void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
