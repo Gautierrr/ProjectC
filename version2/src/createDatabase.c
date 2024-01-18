@@ -1,6 +1,6 @@
 #include "../main.h"
 
-int createDatabase(SDL_Renderer *renderer) {
+int createDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
@@ -35,10 +35,10 @@ int createDatabase(SDL_Renderer *renderer) {
 
         int done = 0;
         int isTypingUsername = 1;
-        char dbName[100];
+        char oldDbName[100];
 
         // Initialiser les chaînes de caractères à zéro
-        memset(dbName, 0, sizeof(dbName));
+        memset(oldDbName, 0, sizeof(oldDbName));
 
         while (!done) {
             while (SDL_PollEvent(&event)) {
@@ -55,12 +55,12 @@ int createDatabase(SDL_Renderer *renderer) {
                         }
                     }
                 } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
-                    strcat(dbName, event.text.text);
+                    strcat(oldDbName, event.text.text);
 
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     SDL_RenderFillRect(renderer, &databaseRect);
 
-                    textSurface = TTF_RenderText_Solid(font, dbName, textColor);
+                    textSurface = TTF_RenderText_Solid(font, oldDbName, textColor);
                     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
                     SDL_FreeSurface(textSurface);
                     SDL_RenderCopy(renderer, textTexture, NULL, &databaseRect);
@@ -72,7 +72,11 @@ int createDatabase(SDL_Renderer *renderer) {
             SDL_Delay(10);
         }
 
-        dbName[strcspn(dbName, "\n")] = '\0';
+        oldDbName[strcspn(oldDbName, "\n")] = '\0';
+
+        // Concaténer le nom de l'utilisateur avec le nom de la base de données -> sous la forme -> nomBdd_username
+        char dbName[100];
+        snprintf(dbName, sizeof(dbName), "%s_%s", oldDbName, loggedInUsername);
 
         char query[150];
         snprintf(query, sizeof(query), "CREATE DATABASE %s", dbName);

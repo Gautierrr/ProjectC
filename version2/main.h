@@ -42,8 +42,8 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
 int testMySQLConnection(SDL_Renderer *renderer);
-int createDatabase(SDL_Renderer *renderer);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
-int loadDatabase(SDL_Renderer *renderer);               // comme ca identification de qui peux modifier tel et tel bdd
+int createDatabase(SDL_Renderer *renderer, char *loggedInUsername);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
+int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername);               // comme ca identification de qui peux modifier tel et tel bdd
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
 void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
