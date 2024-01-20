@@ -65,7 +65,7 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
 int createDatabase(SDL_Renderer *renderer, char *loggedInUsername);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
 int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername);               // comme ca identification de qui peux modifier tel et tel bdd
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
-void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
