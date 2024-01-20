@@ -69,7 +69,7 @@ void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
@@ -78,6 +78,8 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName,
 
 int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 // int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
+int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 
