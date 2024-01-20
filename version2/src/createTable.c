@@ -65,7 +65,7 @@ void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
         SDL_Delay(10);
     }
 
-    snprintf(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (id INT PRIMARY KEY, name VARCHAR(255))", tableName);
+    snprintf(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255))", tableName);
 
     if (mysql_query(conn, query) == 0) {
         printf("\n\n\t\t\tTable '%s' created successfully.\n", tableName);

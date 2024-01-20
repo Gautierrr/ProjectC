@@ -81,7 +81,9 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
 int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-
+// int editContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 

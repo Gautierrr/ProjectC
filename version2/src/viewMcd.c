@@ -191,7 +191,7 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                                 int tableX = tables[i].x;
                                 int tableY = tables[i].y;
                                 int tableWidth = 200;  // Ajustez la largeur de la table
-                                int tableHeight = maxTableHeight + tableHeight + margin * 2;  // Ajustez la hauteur de la table
+                                int tableHeight = tableHeight + margin;  // Ajustez la hauteur de la table
 
                                 if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
                                     event.button.y >= tableY && event.button.y <= tableY + tableHeight) {
