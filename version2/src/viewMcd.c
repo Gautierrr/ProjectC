@@ -1,6 +1,6 @@
 #include "../main.h"
 
-void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     if (mysql_select_db(conn, dbName) == 0) {
         char query[200];
         snprintf(query, sizeof(query),
@@ -18,9 +18,6 @@ void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 
                 ForeignKey foreignKeys[50];
                 int numForeignKeys = 0;
-
-                SDL_Window *window;
-                SDL_CreateWindowAndRenderer(800, 600, 0, &window, &renderer);
 
                 TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 18);
                 SDL_Color textColor = {255, 255, 255};
@@ -187,15 +184,27 @@ void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                 while (!quit) {
                     while (SDL_PollEvent(&event)) {
                         if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
-                            quit = 1;
+                            return 0;
+                        } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+                            // Vérifier si le clic est à l'intérieur de l'une des tables
+                            for (int i = 0; i < numTables; i++) {
+                                int tableX = tables[i].x;
+                                int tableY = tables[i].y;
+                                int tableWidth = 200;  // Ajustez la largeur de la table
+                                int tableHeight = maxTableHeight + tableHeight + margin * 2;  // Ajustez la hauteur de la table
+
+                                if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
+                                    event.button.y >= tableY && event.button.y <= tableY + tableHeight) {
+                                    int modificationSuccessful = clickTable(conn, dbName, tables[i].name, renderer);
+                                    if (modificationSuccessful) {
+                                        return 0;
+                                    }
+                                }
+                            }
                         }
                     }
                     SDL_Delay(10);
                 }
-
-                SDL_DestroyRenderer(renderer);
-                SDL_DestroyWindow(window);
-
                 mysql_free_result(result);
             } else {
                 fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
@@ -206,4 +215,7 @@ void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     } else {
         fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
     }
+
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
 }

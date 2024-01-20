@@ -5,13 +5,13 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createDatabase.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/loadDatabase.png");
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/changeSettings.png");
-    SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/testMysql.png");
+    // SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/testMysql.png");
     SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
 
     SDL_Rect option1Rect = {200, 100, 400, 40};
     SDL_Rect option2Rect = {200, 200, 400, 40};
     SDL_Rect option3Rect = {150, 300, 500, 50};
-    SDL_Rect option4Rect = {150, 400, 500, 50};
+    // SDL_Rect option4Rect = {150, 400, 500, 50};
     SDL_Rect option0Rect = {325, 500, 150, 50};
 
 
@@ -39,11 +39,11 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
                         changeSettings(loggedInUsername, loggedInPassword, renderer);
-                    } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
+                    } /*else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
                                mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
                         option = '4';
                         testMySQLConnection(renderer);
-                    } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
+                    }*/ else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
                         return 0;
@@ -57,7 +57,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
         SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
-        SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
+        // SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
         SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
 
         SDL_RenderPresent(renderer);
@@ -66,7 +66,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
-    SDL_DestroyTexture(option4Texture);
+    // SDL_DestroyTexture(option4Texture);
     SDL_DestroyTexture(option0Texture);
 
     SDL_DestroyRenderer(renderer);

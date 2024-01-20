@@ -31,6 +31,26 @@ typedef struct {
     char targetColumn[50];
 } ForeignKey;
 
+typedef struct {
+    char columnName[50];
+    char dataType[50];
+    char value[100];
+} TableColumnData;
+
+typedef struct {
+    char name[50];
+    char type[50];
+} ColumnInfo;
+
+typedef struct {
+    char name[100];
+    char type[50];
+    int x;
+    int y;
+    int width;
+    int height;
+} TableColumn;
+
 
 
 SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
@@ -41,17 +61,26 @@ void createAccount(SDL_Renderer *renderer);
 int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
-int testMySQLConnection(SDL_Renderer *renderer);
+// int testMySQLConnection(SDL_Renderer *renderer);
 int createDatabase(SDL_Renderer *renderer, char *loggedInUsername);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
 int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername);               // comme ca identification de qui peux modifier tel et tel bdd
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
 void displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-void viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+
+
+
+
+int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+// int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
+
+
+
 
 
 
