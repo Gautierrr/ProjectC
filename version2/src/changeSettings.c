@@ -1,5 +1,25 @@
 #include "../main.h"
 
+int isUsernameTaken2(const char *username, char *currentUsername) {
+    FILE *fp = fopen("bdd/studentInfo.bin", "rb");
+    if (fp == NULL) {
+        printf("\n\t\t\tError opening file!\n");
+        return 1;
+    }
+
+    Student existingUser;
+    while (fread(&existingUser, sizeof(existingUser), 1, fp) == 1) {
+        if (strcmp(username, existingUser.studentUsername) == 0 &&
+            strcmp(username, currentUsername) != 0) {
+            fclose(fp);
+            return 1;
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer)
 {
     Student currentUser;
@@ -17,7 +37,8 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     while (fread(&currentUser, sizeof(currentUser), 1, fp) == 1)
     {
         if (strcmp(currentUsername, currentUser.studentUsername) == 0 &&
-            strcmp(currentPassword, currentUser.studentPassword) == 0) {
+            strcmp(currentPassword, currentUser.studentPassword) == 0)
+        {
             found = 1;
             break;
         }
@@ -28,31 +49,51 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_Rect usernameRect = { 50, 100, 200, 30 };
-    SDL_Rect passwordRect = { 50, 350, 200, 30 };
+    SDL_Rect usernameRect = {50, 150, 200, 30};
+    SDL_Rect passwordRect = {50, 350, 200, 30};
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderFillRect(renderer, &usernameRect);
     SDL_RenderFillRect(renderer, &passwordRect);
 
-    SDL_Rect textRect = { 50, 300, 300, 30 };
+    SDL_Rect textRect = {50, 100, 300, 30};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
-    SDL_Color textColor = { 255, 255, 255 };
+    SDL_Color textColor = {255, 255, 255};
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    // SDL_Color color = {255, 255, 255, 255};
-    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Username:", textColor);
+
+    /*textSurface = TTF_RenderText_Solid(font, "Enter your new ", textColor);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
-    textRect.y = 60;
+    textRect.y = 60;*/
 
-    textSurface = TTF_RenderText_Solid(font, "Enter your new Student's Password:", textColor);
+    // If the user is admin, allow changing only the password
+    if (strcmp(currentUsername, "admin") == 0)
+    {
+        textSurface = TTF_RenderText_Solid(font, "Enter your new Admin Password:", textColor);
+        SDL_Rect passwordRect = {50, 200, 200, 30};
+    }
+    else
+    {
+        textSurface = TTF_RenderText_Solid(font, "Enter your new Student Username:", textColor);
+    }
+
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+
+    textRect.y = 300;
+
+    if (strcmp(currentUsername, "admin") != 0)
+    {
+        textSurface = TTF_RenderText_Solid(font, "Enter your new Student Password:", textColor);
+        textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        SDL_FreeSurface(textSurface);
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    }
 
     SDL_RenderPresent(renderer);
 
@@ -65,40 +106,59 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     memset(currentUser.studentUsername, 0, sizeof(currentUser.studentUsername));
     memset(currentUser.studentPassword, 0, sizeof(currentUser.studentPassword));
 
-    while (!done) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+    while (!done)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
                 done = 1;
-            } else if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_RETURN) {
-                    if (isTypingUsername) {
-                        isTypingUsername = 0;
-                    } else {
+            }
+            else if (event.type == SDL_KEYDOWN)
+            {
+                if (strcmp(currentUsername, "admin") == 0) { 
+                    if (event.key.keysym.sym == SDLK_RETURN) {
                         done = 1;
                     }
-                }
-            } else if (event.type == SDL_TEXTINPUT) {
-                if (isTypingUsername) {
-                    strcat(currentUser.studentUsername, event.text.text);
                 } else {
-                    strcat(currentUser.studentPassword, event.text.text);
+                    if (event.key.keysym.sym == SDLK_RETURN) {
+                        if (isTypingUsername) {
+                            isTypingUsername = 0;
+                        } else {
+                            done = 1;
+                        }
+                    }
+                }
+            }
+            else if (event.type == SDL_TEXTINPUT)
+            {
+                if (strcmp(currentUsername, "admin") == 0) { 
+                    strcat(currentUser.studentPassword, event.text.text);               
+                } else {
+                    if (isTypingUsername) {
+                        strcat(currentUser.studentUsername, event.text.text);
+                    } else {
+                        strcat(currentUser.studentPassword, event.text.text);
+                    }
                 }
 
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderFillRect(renderer, &usernameRect);
                 SDL_RenderFillRect(renderer, &passwordRect);
 
-                textSurface = TTF_RenderText_Solid(font, currentUser.studentUsername, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
+                if (strcmp(currentUsername, "admin") != 0) {
+                    textSurface = TTF_RenderText_Solid(font, currentUser.studentUsername, textColor);
+                    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                    SDL_FreeSurface(textSurface);
+                    SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
+                }
 
                 // Afficher des étoiles pour le mot de passe
                 size_t passwordLength = strlen(currentUser.studentPassword);
                 char maskedPassword[passwordLength + 1];
                 memset(maskedPassword, '*', passwordLength);
                 maskedPassword[passwordLength] = '\0';
-                
+
                 textSurface = TTF_RenderText_Solid(font, maskedPassword, textColor);
                 textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
                 SDL_FreeSurface(textSurface);
@@ -111,16 +171,23 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
         SDL_Delay(10);
     }
 
-    if (found) {
-        fseek(fp, -((long)sizeof(currentUser)), SEEK_CUR);
-        fwrite(&currentUser, sizeof(currentUser), 1, fp);
-
-        printf("\n\n\t\t\tUser settings updated successfully!\n");
+    if (isUsernameTaken2(currentUser.studentUsername, currentUsername)) {
+        printf("\n\n\t\t\tUsername is already taken. Please choose a different username.\n");
+        return;
     } else {
-        printf("\n\n\t\t\tUser not found. Please check your current username and password.\n");
+        if (found) {
+            if (strcmp(currentUsername, "admin") == 0) { 
+                strcat(currentUser.studentUsername, currentUsername);
+            }
+
+            fseek(fp, -((long)sizeof(currentUser)), SEEK_CUR);
+            fwrite(&currentUser, sizeof(currentUser), 1, fp);
+
+            printf("\n\n\t\t\tUser settings updated successfully!\n");
+        } else {
+            printf("\n\n\t\t\tUser not found. Please check your current username and password.\n");
+        }
+
+        fclose(fp);
     }
-
-    fclose(fp);
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }

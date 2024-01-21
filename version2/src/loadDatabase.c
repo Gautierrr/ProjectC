@@ -1,5 +1,16 @@
 #include "../main.h"
 
+const char *essentialDatabases2[] = {"mysql", "information_schema", "performance_schema", "sys", "mabasededonnees"};
+
+int isEssentialDatabase2(const char *dbName) {
+    for (size_t i = 0; i < sizeof(essentialDatabases2) / sizeof(essentialDatabases2[0]); ++i) {
+        if (strcmp(dbName, essentialDatabases2[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
     MYSQL *conn = mysql_init(NULL);
 
@@ -79,23 +90,27 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
         strcpy(dbName, oldDbName);
     } else {
         snprintf(dbName, sizeof(dbName), "%s_%s", oldDbName, loggedInUsername);
-    }
+    }    
 
-    if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
-    {
-        printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
-        printf("\n\n\t\t\tEnter any keys to continue.......");
+    if (isEssentialDatabase2(dbName)) {
+        printf("Error: Cannot delete essential database '%s'.\n", dbName);
+    } else {
+        if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
+        {
+            printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
+            printf("\n\n\t\t\tEnter any keys to continue.......");
 
-        databaseMenu(conn, renderer, dbName);
+            databaseMenu(conn, renderer, dbName);
 
-        mysql_close(conn);
-        return 0;
-    }
-    else
-    {
-        fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
-        printf("\n\n\t\t\tEnter any keys to continue.......");
-        mysql_close(conn);
-        return 1;
+            mysql_close(conn);
+            return 0;
+        }
+        else
+        {
+            fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
+            printf("\n\n\t\t\tEnter any keys to continue.......");
+            mysql_close(conn);
+            return 1;
+        }
     }
 }

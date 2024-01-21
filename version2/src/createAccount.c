@@ -1,5 +1,24 @@
 #include "../main.h"
 
+int isUsernameTaken(const char *username) {
+    FILE *fp = fopen("bdd/studentInfo.bin", "rb");
+    if (fp == NULL) {
+        printf("\n\t\t\tError opening file!\n");
+        return 1;
+    }
+
+    Student existingUser;
+    while (fread(&existingUser, sizeof(existingUser), 1, fp) == 1) {
+        if (strcmp(username, existingUser.studentUsername) == 0) {
+            fclose(fp);
+            return 1; // Username deja pris
+        }
+    }
+
+    fclose(fp);
+    return 0; // Username pas pris
+}
+
 void createAccount(SDL_Renderer *renderer) {
     Student studentInformation;
 
@@ -91,15 +110,20 @@ void createAccount(SDL_Renderer *renderer) {
         SDL_Delay(10);
     }
 
-    FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
-    if (fp == NULL) {
-        printf("\n\t\t\tError opening file!\n");
+    if (isUsernameTaken(studentInformation.studentUsername)) {
+        printf("\n\n\t\t\tUsername is already taken. Please choose a different username.\n");
         return;
+    } else {
+        FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
+        if (fp == NULL) {
+            printf("\n\t\t\tError opening file!\n");
+            return;
+        }
+
+        fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
+        fclose(fp);
+
+        printf("\n\n\t\t\tInformation has been stored successfully\n");
+        printf("\n\n\t\t\tEnter any keys to continue.......");
     }
-
-    fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
-    fclose(fp);
-
-    printf("\n\n\t\t\tInformation has been stored successfully\n");
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }
