@@ -22,14 +22,14 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
     SDL_Color textColor = { 255, 255, 255 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
     // SDL_Color color = {255, 255, 255, 255};
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Username:", textColor);
+    textSurface = TTF_RenderText_Solid(font, "Enter Student's Username : ", textColor);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
     textRect.y = 300;
 
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Password:", textColor);
+    textSurface = TTF_RenderText_Solid(font, "Enter Student's Password : ", textColor);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     SDL_FreeSurface(textSurface);
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);

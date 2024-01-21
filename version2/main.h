@@ -86,6 +86,9 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
 int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
+int viewAllDatabases(SDL_Renderer *renderer);
+int deleteDatabase(SDL_Renderer *renderer);
 
 
 

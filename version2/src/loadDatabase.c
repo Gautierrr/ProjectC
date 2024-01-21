@@ -35,7 +35,6 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
     int isTypingUsername = 1;
     char oldDbName[100];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(oldDbName, 0, sizeof(oldDbName));
 
     while (!done) {
@@ -71,10 +70,16 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
     }
 
     oldDbName[strcspn(oldDbName, "\n")] = '\0';
+    char dbName[100];
 
     // Concaténer le nom de l'utilisateur avec le nom de la base de données -> sous la forme -> nomBdd_username
-    char dbName[100];
-    snprintf(dbName, sizeof(dbName), "%s_%s", oldDbName, loggedInUsername);
+    // Si admin on conserve juste ce qu'il a tapé
+
+    if (strcmp(loggedInUsername, "admin") == 0) {
+        strcpy(dbName, oldDbName);
+    } else {
+        snprintf(dbName, sizeof(dbName), "%s_%s", oldDbName, loggedInUsername);
+    }
 
     if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
     {

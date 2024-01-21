@@ -89,7 +89,7 @@ int createDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
             printf("\n\n\t\t\tEnter any keys to continue.......");
         }
 
-        databaseMenu(conn, renderer, dbName);
+        // databaseMenu(conn, renderer, dbName);
 
         mysql_close(conn);
         return 0;
