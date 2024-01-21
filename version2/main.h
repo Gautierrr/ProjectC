@@ -84,7 +84,8 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 // int editContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-
+int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 
