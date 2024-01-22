@@ -35,13 +35,13 @@ int viewAllDatabases(SDL_Renderer *renderer) {
 
         SDL_Rect textRect = {50, 400, 180, 30};
         SDL_Color textColor = {0, 0, 0};
-        TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+        TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
         SDL_Surface *textSurface;
         SDL_Texture *textTexture;
 
         SDL_Event event;
-        int done = 0;
+        int quit = 0;
 
         MYSQL_ROW row;
         while ((row = mysql_fetch_row(result)) != NULL) {
@@ -66,16 +66,16 @@ int viewAllDatabases(SDL_Renderer *renderer) {
 
         SDL_RenderPresent(renderer);        
 
-        while (!done) {
+        while (!quit) {
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                     case SDL_QUIT:
-                            done = 1;
+                            quit = 1;
                             return 0;
                         break;
                     case SDL_KEYDOWN:
                         if (event.key.keysym.sym == SDLK_ESCAPE) {
-                            done = 1;
+                            quit = 1;
                             return 0;
                         }
                         break;

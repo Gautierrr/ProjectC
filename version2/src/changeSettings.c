@@ -72,7 +72,7 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = {0, 0, 0};
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     if (strcmp(currentUsername, "admin") == 0) {
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
@@ -94,7 +94,6 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     int quit = 0;
     int isTypingUsername = 1;
 
-    // Initialiser les chaînes de caractères à zéro
     memset(currentUser.studentUsername, 0, sizeof(currentUser.studentUsername));
     memset(currentUser.studentPassword, 0, sizeof(currentUser.studentPassword));
 
@@ -155,7 +154,6 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
                     SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
                 }
 
-                // Afficher des étoiles pour le mot de passe
                 size_t passwordLength = strlen(currentUser.studentPassword);
                 char maskedPassword[passwordLength + 1];
                 memset(maskedPassword, '*', passwordLength);

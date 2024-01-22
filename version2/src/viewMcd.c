@@ -19,7 +19,7 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                 ForeignKey foreignKeys[50];
                 int numForeignKeys = 0;
 
-                TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 18);
+                TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 18);
                 SDL_Color textColor = {0, 0, 0};
                 SDL_Color textColor2 = {255, 255, 255};
 
@@ -82,7 +82,7 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                         MYSQL_RES *columnResult = mysql_store_result(conn);
 
                         if (columnResult != NULL) {
-                            int currentColumnY = maxTableHeight + 10;  // Aligner verticalement en dessous de la hauteur maximale
+                            int currentColumnY = maxTableHeight + 10;
                             int currentColumnX = tables[numTables].x;
 
                             int numColumns = mysql_num_rows(columnResult);
@@ -106,7 +106,6 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                                 SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
                                 SDL_DestroyTexture(textTexture);
 
-                                // Pour récupérer le type de la colonne
                                 snprintf(query, sizeof(query),
                                         "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'",
                                         dbName, tables[numTables].name, columnRow[0]);
@@ -198,12 +197,11 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                             quit = 1;
                             return 0;
                         } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-                            // Vérifier si le clic est à l'intérieur de l'une des tables
                             for (int i = 0; i < numTables; i++) {
                                 int tableX = tables[i].x;
                                 int tableY = tables[i].y;
-                                int tableWidth = 200;  // Ajustez la largeur de la table
-                                int tableHeight = tableHeight + margin;  // Ajustez la hauteur de la table
+                                int tableWidth = 200;
+                                int tableHeight = tableHeight + margin;
 
                                 if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
                                     event.button.y >= tableY && event.button.y <= tableY + tableHeight) {

@@ -26,19 +26,16 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-
-    // SDL_RenderPresent(renderer2);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingUsername = 1;
     char oldTableName[100];
     char newTableName[100];
     char query[250];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(oldTableName, 0, sizeof(oldTableName));
     memset(newTableName, 0, sizeof(newTableName));
 
@@ -48,7 +45,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
     SDL_RenderCopy(renderer2, option2Texture, NULL, &option2Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(option1Texture);
@@ -62,7 +59,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
                     if (isTypingUsername) {
                         isTypingUsername = 0;
                     } else {
-                        done = 1;
+                        quit = 1;
                     }
                 }
             } else if (event.type == SDL_TEXTINPUT) {

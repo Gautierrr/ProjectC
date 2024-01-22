@@ -36,11 +36,11 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 0, 0, 0 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingUsername = 1;
     char oldDbName[100];
 
@@ -51,23 +51,23 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
     SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
-                done = 1;
+                quit = 1;
                 SDL_DestroyTexture(option1Texture);
                 SDL_DestroyTexture(backgroundTexture);
                 SDL_DestroyRenderer(renderer2);
                 SDL_DestroyWindow(window);
                 return 0;
             } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
-                done = 1;
+                quit = 1;
             } else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
                     if (isTypingUsername) {
                         isTypingUsername = 0;
                     } else {
-                        done = 1;
+                        quit = 1;
                     }
                 }
             } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
@@ -92,7 +92,7 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
     char dbName[100];
 
     // Concaténer le nom de l'utilisateur avec le nom de la base de données -> sous la forme -> nomBdd_username
-    // Si admin on conserve juste ce qu'il a tapé
+    // Si admin on conserve juste ce qu'il ai tapé
 
     if (strcmp(loggedInUsername, "admin") == 0) {
         strcpy(dbName, oldDbName);

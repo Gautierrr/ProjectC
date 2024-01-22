@@ -32,7 +32,7 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
     SDL_RenderPresent(renderer);
 
     SDL_Rect textRect = {50, 340, 80, 30};
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 18);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 18);
     SDL_Color textColor = {0, 0, 0};
 
     MYSQL_FIELD *field;

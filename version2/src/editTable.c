@@ -34,11 +34,11 @@ int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Rende
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingTableName = 1;
     char tableName[100];
     char query[250];
@@ -50,7 +50,7 @@ int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Rende
     SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(option1Texture);
@@ -59,13 +59,13 @@ int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Rende
                 SDL_DestroyWindow(window);
                 return 0;
             }  else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
-                    done = 1;
+                    quit = 1;
                 } else if (event.type == SDL_KEYDOWN) {
                     if (event.key.keysym.sym == SDLK_RETURN) {
                         if (isTypingTableName) {
                             isTypingTableName = 0;
                         } else {
-                            done = 1;
+                            quit = 1;
                         }
                     }
                 } else if (event.type == SDL_TEXTINPUT) {

@@ -11,12 +11,12 @@ int isUsernameTaken(const char *username) {
     while (fread(&existingUser, sizeof(existingUser), 1, fp) == 1) {
         if (strcmp(username, existingUser.studentUsername) == 0) {
             fclose(fp);
-            return 1; // Username deja pris
+            return 1;
         }
     }
 
     fclose(fp);
-    return 0; // Username pas pris
+    return 0;
 }
 
 void createAccount(SDL_Renderer *renderer) {
@@ -46,7 +46,7 @@ void createAccount(SDL_Renderer *renderer) {
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingUsername = 1;
 
     memset(studentInformation.studentUsername, 0, sizeof(studentInformation.studentUsername));
@@ -57,22 +57,21 @@ void createAccount(SDL_Renderer *renderer) {
     SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
     SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(backgroundTexture);
                 SDL_DestroyTexture(option1Texture);
                 SDL_DestroyTexture(option2Texture);
                 SDL_DestroyTexture(option3Texture);
-                // SDL_DestroyTexture(option0Texture);
-                done = 1;
+                quit = 1;
                 return;
             } else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
                     if (isTypingUsername) {
                         isTypingUsername = 0;
                     } else {
-                        done = 1;
+                        quit = 1;
                     }
                 }
             } else if (event.type == SDL_TEXTINPUT) {
@@ -91,7 +90,6 @@ void createAccount(SDL_Renderer *renderer) {
                 SDL_FreeSurface(textSurface);
                 SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
 
-                // Afficher des étoiles pour le mot de passe
                 size_t passwordLength = strlen(studentInformation.studentPassword);
                 char maskedPassword[passwordLength + 1];
                 memset(maskedPassword, '*', passwordLength);
@@ -107,8 +105,6 @@ void createAccount(SDL_Renderer *renderer) {
         }
 
         SDL_Delay(10);
-
-        // SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
 
         SDL_RenderPresent(renderer);
     }

@@ -19,12 +19,12 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = {255, 255, 255};
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
     
     SDL_Event event;
 
     char rowId[255];
-    int done = 0;
+    int quit = 0;
 
     memset(rowId, 0, sizeof(rowId));
 
@@ -33,7 +33,7 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
     SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(option1Texture);
@@ -42,10 +42,10 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
                 SDL_DestroyWindow(window);
                 return 0;
             } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
-                done = 1;
+                quit = 1;
             } else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
-                    done = 1;
+                    quit = 1;
                 }
             } else if (event.type == SDL_TEXTINPUT) {
                 strcat(rowId, event.text.text);
@@ -61,7 +61,6 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
         SDL_Delay(10);
     }
 
-    // Requête SQL pour supprimer la ligne avec l'ID fourni
     snprintf(query, sizeof(query), "DELETE FROM %s.%s WHERE id = %s", dbName, tableName, rowId);
 
     if (mysql_query(conn, query) != 0) {

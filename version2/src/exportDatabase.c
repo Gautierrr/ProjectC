@@ -10,7 +10,6 @@ int exportDatabase(MYSQL *conn, const char *dbName) {
         return 1;
     }
 
-    // Obtenir la liste des tables dans la base de données
     MYSQL_RES *tablesResult;
     char tablesQuery[512];
     snprintf(tablesQuery, sizeof(tablesQuery), "SHOW TABLES FROM %s", dbName);
@@ -19,6 +18,7 @@ int exportDatabase(MYSQL *conn, const char *dbName) {
         fclose(file);
         return 1;
     }
+
     tablesResult = mysql_store_result(conn);
 
     MYSQL_ROW tableRow;
@@ -40,6 +40,7 @@ int exportDatabase(MYSQL *conn, const char *dbName) {
 
         MYSQL_ROW columnRow;
         int firstColumn = 1;
+        
         while ((columnRow = mysql_fetch_row(columnsResult)) != NULL) {
             char *columnName = columnRow[0];
             char *columnType = columnRow[1];

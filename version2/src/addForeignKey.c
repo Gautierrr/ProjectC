@@ -26,17 +26,16 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingTableName = 1;
     char sourceColumnName[100];
     char targetTableName[100];
     char query[250];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(sourceColumnName, 0, sizeof(sourceColumnName));
     memset(targetTableName, 0, sizeof(targetTableName));
 
@@ -46,7 +45,7 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
     SDL_RenderCopy(renderer2, option2Texture, NULL, &option2Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(option1Texture);
@@ -60,7 +59,7 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
                     if (isTypingTableName) {
                         isTypingTableName = 0;
                     } else {
-                        done = 1;
+                        quit = 1;
                     }
                 }
             } else if (event.type == SDL_TEXTINPUT) {
@@ -93,7 +92,6 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 
     snprintf(query, sizeof(query), "ALTER TABLE %s ADD FOREIGN KEY (%s) REFERENCES %s(id)", tableName, sourceColumnName, targetTableName);
 
-    // Exécution de la requête
     if (mysql_query(conn, query) == 0) {
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);

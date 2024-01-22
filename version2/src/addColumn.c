@@ -24,11 +24,11 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingTableName = 1;
     char columnName[100];
     char columnType[50];
@@ -43,7 +43,7 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
     SDL_RenderCopy(renderer2, option2Texture, NULL, &option2Rect);
     SDL_RenderPresent(renderer2);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                     SDL_DestroyTexture(option1Texture);
@@ -57,7 +57,7 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
                         if (isTypingTableName) {
                             isTypingTableName = 0;
                         } else {
-                            done = 1;
+                            quit = 1;
                         }
                     }
                 } else if (event.type == SDL_TEXTINPUT) {

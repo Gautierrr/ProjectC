@@ -23,11 +23,11 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 0, 0, 0 };
-    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
     SDL_Event event;
 
-    int done = 0;
+    int quit = 0;
     int isTypingUsername = 1;
     char username[50];
     char password[20];
@@ -40,7 +40,7 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
     SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
     SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
 
-    while (!done) {
+    while (!quit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(backgroundTexture);
@@ -54,7 +54,7 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
                     if (isTypingUsername) {
                         isTypingUsername = 0;
                     } else {
-                        done = 1;
+                        quit = 1;
                     }
                 }
             } else if (event.type == SDL_TEXTINPUT) {

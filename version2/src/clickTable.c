@@ -20,7 +20,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 SDL_RenderClear(renderer2);
                 SDL_Color textColor = { 0, 0, 0 };
                 SDL_Color textColor2 = { 255, 255, 255 };
-                TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
+                TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Bold.ttf", 24);
 
                 SDL_Surface *textSurface;
                 SDL_Texture *textTexture;
@@ -93,7 +93,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                     MYSQL_RES *columnResult = mysql_store_result(conn);
 
                     if (columnResult != NULL) {
-                        int currentColumnY = maxTableHeight + 10;  // Aligner verticalement en dessous de la hauteur maximale
+                        int currentColumnY = maxTableHeight + 10;
                         int currentColumnX = tables[numTables].x;
 
                         int numColumns = mysql_num_rows(columnResult);
@@ -117,7 +117,6 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                             SDL_RenderCopy(renderer2, textTexture, NULL, &textRect);
                             SDL_DestroyTexture(textTexture);
 
-                            // Pour récupérer le type de la colonne
                             snprintf(query, sizeof(query),
                                     "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'",
                                     dbName, tables[numTables].name, columnRow[0]);
@@ -161,22 +160,20 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 }
 
                 numTables++;
-                //}
 
                 SDL_RenderPresent(renderer2);
 
-                int done = 0;
+                int quit = 0;
                 SDL_Event event;
                 int isTypingTableName = 1;
                 int isTypingColumnName = 0;
                 int isTypingTypeName = 0;
 
-                // Initialiser les chaînes de caractères à zéro
                 memset(columnName, 0, sizeof(columnName));
                 memset(newColumnName, 0, sizeof(newColumnName));
                 memset(newColumnType, 0, sizeof(newColumnType));
 
-                while (!done) {
+                while (!quit) {
                     while (SDL_PollEvent(&event)) {
                         if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                             SDL_DestroyTexture(backgroundTexture);
@@ -196,7 +193,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                                 isTypingTypeName = 1;
                             } else if (isTypingTypeName) {
                                 isTypingTypeName = 1;
-                                done = 1;
+                                quit = 1;
                             }
                             }
                         } else if (event.type == SDL_TEXTINPUT) {

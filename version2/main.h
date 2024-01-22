@@ -32,32 +32,6 @@ typedef struct {
     char targetColumn[50];
 } ForeignKey;
 
-typedef struct {
-    char columnName[50];
-    char dataType[50];
-    char value[100];
-} TableColumnData;
-
-typedef struct {
-    char name[50];
-    char type[50];
-} ColumnInfo;
-
-typedef struct {
-    char name[100];
-    char type[50];
-    int x;
-    int y;
-    int width;
-    int height;
-} TableColumn;
-
-
-
-SDL_Texture *renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, int x, int y);
-
-
-// Graphique fait  ->  mais esthétique à faire !!!
 void createAccount(SDL_Renderer *renderer);
 int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
@@ -90,28 +64,5 @@ void errorAccount(SDL_Renderer *renderer);
 void errorDatabase(SDL_Renderer *renderer);
 void errorTable(SDL_Renderer *renderer);
 void errorContent(SDL_Renderer *renderer);
-
-
-
-
-
-
-
-// void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-
-
-
-
-// int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
-// int editContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-
-
-
-
-
-
-
-
-
 
 #endif
