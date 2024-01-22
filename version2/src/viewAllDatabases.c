@@ -33,7 +33,7 @@ int viewAllDatabases(SDL_Renderer *renderer) {
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderPresent(renderer);
 
-        SDL_Rect textRect = {50, 350, 300, 30};
+        SDL_Rect textRect = {50, 400, 180, 30};
         SDL_Color textColor = {0, 0, 0};
         TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
 
@@ -56,23 +56,30 @@ int viewAllDatabases(SDL_Renderer *renderer) {
             SDL_FreeSurface(textSurface);
             SDL_DestroyTexture(textTexture);
 
-            textRect.y += 40;  // Espacement entre chaque base de données
+            textRect.x += 250;  // Espacement entre chaque base de données
+
+            // Si la nouvelle position X dépasse la largeur de la fenêtre, passez à la ligne suivante
+            if (textRect.x + textRect.w > 1500) {
+                textRect.x = 50;  // Réinitialisez la position X
+                textRect.y += 40;  // Passez à la ligne suivante
+            }
         }
 
-        SDL_RenderPresent(renderer);
-        mysql_free_result(result);
-        TTF_CloseFont(font);
-
-        
+        SDL_RenderPresent(renderer);        
 
         while (!done) {
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
-                    mysql_close(conn);
-                    SDL_DestroyTexture(backgroundTexture);
-                    SDL_DestroyTexture(option1Texture);
-                    SDL_DestroyRenderer(renderer);
-                    return 0;
+                switch (event.type) {
+                    case SDL_QUIT:
+                            done = 1;
+                            return 0;
+                        break;
+                    case SDL_KEYDOWN:
+                        if (event.key.keysym.sym == SDLK_ESCAPE) {
+                            done = 1;
+                            return 0;
+                        }
+                        break;
                 }
             }
             SDL_Delay(10);

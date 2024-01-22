@@ -1175,6 +1175,8 @@ stateConnect(int *connect)
 // addContent
 // deleteContent
 // displayContent
+// viewAllDatabases
+// deleteDatabase
 
 
 

@@ -1,5 +1,20 @@
 #include "../main.h"
 
+int tableExist(MYSQL *conn, const char *dbName, const char *tableName) {
+    char query[512];
+    snprintf(query, sizeof(query), "SHOW TABLES FROM %s LIKE '%s'", dbName, tableName);
+
+    MYSQL_RES *result = mysql_store_result(conn);
+    if (result == NULL) {
+        fprintf(stderr, "Error fetching table information: %s\n", mysql_error(conn));
+        return 0;
+    }
+
+    mysql_free_result(result);
+
+    return 1;
+}
+
 int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2) {
 
     SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_RESIZABLE);
@@ -72,6 +87,15 @@ int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Rende
         }
 
         SDL_Delay(10);
+    }
+
+    if (!tableExist(conn, dbName, tableName)) {
+        printf("\n\n\t\t\tThe table '%s' does not exist.\n", tableName);
+        SDL_DestroyTexture(option1Texture);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer2);
+        SDL_DestroyWindow(window);
+        return 0;
     }
 
     SDL_DestroyTexture(option1Texture);

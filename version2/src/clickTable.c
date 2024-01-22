@@ -62,27 +62,6 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 SDL_RenderCopy(renderer2, option3Texture, NULL, &option3Rect);
                 SDL_RenderPresent(renderer2);
                 
-                /*textSurface = TTF_RenderText_Solid(font, "Enter the name of the column to modify : ", textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer2, textTexture, NULL, &textRect);
-
-                textRect.y = 175;
-
-                textSurface = TTF_RenderText_Solid(font, "Enter the name of the new name column : ", textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer2, textTexture, NULL, &textRect);
-
-                textRect.y = 275;
-
-                textSurface = TTF_RenderText_Solid(font, "Enter the data type of the new name column : ", textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer2, textTexture, NULL, &textRect);*/
-
-
-                //while (row = mysql_fetch_row(result)) {
                 strcpy(tables[numTables].name, tableName);
                 tables[numTables].x = currentX;
                 tables[numTables].y = currentY;

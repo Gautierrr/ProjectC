@@ -78,6 +78,16 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
+int viewAllDatabases(SDL_Renderer *renderer);
+int deleteDatabase(SDL_Renderer *renderer);
+
+
+
+
+
+
+
 
 
 
@@ -89,18 +99,8 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName,
 
 // int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
 // int editContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
-int viewAllDatabases(SDL_Renderer *renderer);
-int deleteDatabase(SDL_Renderer *renderer);
 
 
-
-
-// ########################################################################
-// #################                                      #################
-// #################           Voir pour le MCD           #################
-// #################                                      #################
-// ########################################################################
 
 
 

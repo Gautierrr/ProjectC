@@ -126,8 +126,13 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
         {
             fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
             printf("\n\n\t\t\tEnter any keys to continue.......");
+            
+            SDL_DestroyTexture(option1Texture);
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyRenderer(renderer2);
+            SDL_DestroyWindow(window);
             mysql_close(conn);
-            return 1;
+            return 0;
         }
     }
 }
