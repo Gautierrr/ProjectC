@@ -85,6 +85,7 @@ void createAccount(SDL_Renderer *renderer) {
                 SDL_DestroyTexture(option3Texture);
                 // SDL_DestroyTexture(option0Texture);
                 done = 1;
+                return;
             } else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RETURN) {
                     if (isTypingUsername) {

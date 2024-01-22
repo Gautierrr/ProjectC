@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <conio.h>
+#include "curl/curl.h"
 
 typedef struct Student
 {
@@ -73,7 +74,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2);
 int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2);
 int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
-void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2); // -> Id en auto-Increment donc impossible de changer de clé primaires
+// void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2); // -> Id en auto-Increment donc impossible de changer de clé primaires
 void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
@@ -82,6 +83,7 @@ int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rend
 int viewAllDatabases(SDL_Renderer *renderer);
 int deleteDatabase(SDL_Renderer *renderer);
 
+int downloadImg(SDL_Renderer *renderer);
 
 
 
@@ -91,8 +93,7 @@ int deleteDatabase(SDL_Renderer *renderer);
 
 
 
-
-void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+// void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 

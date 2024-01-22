@@ -22,12 +22,14 @@ int SDL_main(int argc, char *argv[]) {
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/signUp.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/logIn.png");
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/accessDatabaseMenu.png");
+    SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/logoCbv.png");
     SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/background1.jpg");
 
     SDL_Rect option1Rect = {40, 30, 150, 50};
     SDL_Rect option2Rect = {250, 30, 150, 50};
     SDL_Rect option3Rect = {600, 7, 650, 95};
+    SDL_Rect option4Rect = {100, 500, 450, 450};
     SDL_Rect option0Rect = {1300, 700, 150, 50};
 
 
@@ -73,6 +75,10 @@ int SDL_main(int argc, char *argv[]) {
                             printf("\n\n\t\t\tEnter any keys to continue.......");
                         }
                         result = 0;
+                    } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
+                               mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
+                        option = '4';
+                        downloadImg(renderer);
                     } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
@@ -88,6 +94,7 @@ int SDL_main(int argc, char *argv[]) {
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
         SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
+        SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
         SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
 
         SDL_RenderPresent(renderer);
@@ -97,6 +104,7 @@ int SDL_main(int argc, char *argv[]) {
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
+    SDL_DestroyTexture(option4Texture);
     SDL_DestroyTexture(option0Texture);
 
 
