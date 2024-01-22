@@ -95,7 +95,6 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 
     // Exécution de la requête
     if (mysql_query(conn, query) == 0) {
-        printf("Foreign key added successfully.\n");
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -103,7 +102,7 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
         SDL_DestroyWindow(window);
         return;
     } else {
-        fprintf(stderr, "Error adding foreign key: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -111,6 +110,4 @@ void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
         SDL_DestroyWindow(window);
         return;
     }
-
-    // Vous pouvez ajouter ici le code pour revenir à la page précédente (le MCD par exemple)
 }

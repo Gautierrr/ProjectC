@@ -65,7 +65,7 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
     snprintf(query, sizeof(query), "DELETE FROM %s.%s WHERE id = %s", dbName, tableName, rowId);
 
     if (mysql_query(conn, query) != 0) {
-        fprintf(stderr, "Error deleting content: %s\n", mysql_error(conn));
+        errorContent(renderer2);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyRenderer(renderer2);
@@ -73,7 +73,6 @@ int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Re
         return 1;
     }
 
-    printf("Content deleted successfully from the table %s.\n", tableName);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyRenderer(renderer2);

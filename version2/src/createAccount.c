@@ -24,50 +24,31 @@ void createAccount(SDL_Renderer *renderer) {
 
     SDL_RenderClear(renderer);
 
-    SDL_Rect usernameRect = { 520, 425, 100, 30 };
-    SDL_Rect passwordRect = { 520, 625, 100, 30 };
+    SDL_Rect usernameRect = { 590, 575, 125, 50 };
+    SDL_Rect passwordRect = { 590, 775, 125, 50 };
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderFillRect(renderer, &usernameRect);
     SDL_RenderFillRect(renderer, &passwordRect);
 
-    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/loginPage.png");
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createAccountPage.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/username.png");
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/password.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
-    SDL_Rect option1Rect = {550, 200, 400, 100};
-    SDL_Rect option2Rect = {500, 350, 250, 70};
-    SDL_Rect option3Rect = {500, 550, 250, 70};
-    // SDL_Rect option0Rect = {1300, 700, 150, 50};
-    
-    //SDL_Rect textRect = { 50, 60, 300, 30 };
+    SDL_Rect option1Rect = {700, 300, 500, 150};
+    SDL_Rect option2Rect = {575, 500, 250, 70};
+    SDL_Rect option3Rect = {575, 700, 250, 70};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
-    SDL_Color textColor = { 255, 255, 255 };
+    SDL_Color textColor = { 0, 0, 0 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    // SDL_Color color = {255, 255, 255, 255};
-    /*textSurface = TTF_RenderText_Solid(font, "Enter Student's Username:", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    textRect.y = 300;
-
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Password:", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    SDL_RenderPresent(renderer);*/
 
     SDL_Event event;
 
     int done = 0;
     int isTypingUsername = 1;
 
-    // Initialiser les chaînes de caractères à zéro
     memset(studentInformation.studentUsername, 0, sizeof(studentInformation.studentUsername));
     memset(studentInformation.studentPassword, 0, sizeof(studentInformation.studentPassword));
     
@@ -101,7 +82,7 @@ void createAccount(SDL_Renderer *renderer) {
                     strcat(studentInformation.studentPassword, event.text.text);
                 }
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
                 SDL_RenderFillRect(renderer, &usernameRect);
                 SDL_RenderFillRect(renderer, &passwordRect);
 
@@ -133,24 +114,20 @@ void createAccount(SDL_Renderer *renderer) {
     }
 
     if (isUsernameTaken(studentInformation.studentUsername)) {
-        printf("\n\n\t\t\tUsername is already taken. Please choose a different username.\n");
+        errorAccount(renderer);
         return;
     } else {
         FILE *fp = fopen("bdd/studentInfo.bin", "ab+");
         if (fp == NULL) {
-            printf("\n\t\t\tError opening file!\n");
+            errorAccount(renderer);
             return;
         }
 
         fwrite(&studentInformation, sizeof(studentInformation), 1, fp);
         fclose(fp);
-
-        printf("\n\n\t\t\tInformation has been stored successfully\n");
-        printf("\n\n\t\t\tEnter any keys to continue.......");
     }
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
-    // SDL_DestroyTexture(option0Texture);
 }

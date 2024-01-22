@@ -11,14 +11,14 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
     snprintf(query, sizeof(query), "DESCRIBE %s.%s", dbName, tableName);
 
     if (mysql_query(conn, query) != 0) {
-        fprintf(stderr, "Error describing table: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         return 1;
     }
 
     result = mysql_store_result(conn);
 
     if (result == NULL) {
-        fprintf(stderr, "Error fetching table description: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         return 1;
     }
 
@@ -106,7 +106,7 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
     snprintf(query, sizeof(query), "INSERT INTO %s.%s (%s) VALUES (%s)", dbName, tableName, columnsPart, columnValue);
 
     if (mysql_query(conn, query) != 0) {
-        fprintf(stderr, "Error adding content: %s\n", mysql_error(conn));
+        errorContent(renderer2);
         mysql_free_result(result);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -116,7 +116,6 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
     }
 
     mysql_free_result(result);
-    printf("Content added successfully to the table %s.\n", tableName);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyRenderer(renderer2);

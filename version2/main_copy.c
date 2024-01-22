@@ -1156,32 +1156,28 @@ stateConnect(int *connect)
 // main
 // createAccount
 // authentificationUser
-// maineMenu
+// mainMenu
 // createDatabase
 // loadDatabase
 // changeSettings
-// databaseMenu
-// displayAllTables
-// clickTable
-// viewMcd
-// createTable
-// deleteTable
-// renameTable
-// editTable
-// editTableMenu
-// addColumn
-// addPrimaryKey -> Id en auto-Increment donc impossible de changer de clé primaires
-// addForeignKey
-// addContent
-// deleteContent
-// displayContent
-// viewAllDatabases
-// deleteDatabase
-
-
-
-// #include "curl/include/curl/curl.h"
-
+ databaseMenu
+ displayAllTables
+ clickTable
+ viewMcd
+ createTable
+ deleteTable
+ renameTable
+ editTable
+ editTableMenu
+ addColumn
+ addPrimaryKey -> Id en auto-Increment donc impossible de changer de clé primaires
+ addForeignKey
+ addContent
+ deleteContent
+ displayContent
+ viewAllDatabases
+ deleteDatabase
+// downloadImg
 
 
 
@@ -1194,7 +1190,26 @@ stateConnect(int *connect)
 
 
 
-// faire partie admin !!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

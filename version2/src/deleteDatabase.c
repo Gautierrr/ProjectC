@@ -19,7 +19,7 @@ int deleteDatabase(SDL_Renderer *renderer2) {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
-        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        errorDatabase(renderer2);
         return EXIT_FAILURE;
     }
 
@@ -109,7 +109,7 @@ int deleteDatabase(SDL_Renderer *renderer2) {
         }
 
         if (isEssentialDatabase(dbName)) {
-            printf("Error: Cannot delete essential database '%s'.\n", dbName);
+            errorDatabase(renderer2);
             SDL_DestroyTexture(option1Texture);
             SDL_DestroyTexture(option2Texture);
             SDL_DestroyTexture(backgroundTexture);
@@ -121,7 +121,7 @@ int deleteDatabase(SDL_Renderer *renderer2) {
             snprintf(query, sizeof(query), "DROP DATABASE %s", dbName);
 
             if (mysql_query(conn, query) != 0) {
-                fprintf(stderr, "Error deleting database: %s\n", mysql_error(conn));
+                errorDatabase(renderer2);
                 SDL_DestroyTexture(option1Texture);
                 SDL_DestroyTexture(option2Texture);
                 SDL_DestroyTexture(backgroundTexture);
@@ -130,7 +130,6 @@ int deleteDatabase(SDL_Renderer *renderer2) {
                 return 0;
             }
 
-            printf("Database '%s' deleted successfully.\n", dbName);
             SDL_DestroyTexture(option1Texture);
             SDL_DestroyTexture(option2Texture);
             SDL_DestroyTexture(backgroundTexture);
@@ -138,7 +137,7 @@ int deleteDatabase(SDL_Renderer *renderer2) {
             SDL_DestroyWindow(window);
             return 0;
         } else {
-            printf("Deletion cancelled.\n");
+            errorDatabase(renderer2);
             SDL_DestroyTexture(option1Texture);
             SDL_DestroyTexture(option2Texture);
             SDL_DestroyTexture(backgroundTexture);
@@ -146,11 +145,8 @@ int deleteDatabase(SDL_Renderer *renderer2) {
             SDL_DestroyWindow(window);
             return 0;
         }
-    }
-    else
-    {
-        fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
-        printf("\n\n\t\t\tEnter any keys to continue.......");
+    } else {
+        errorDatabase(renderer2);
         mysql_close(conn);
         return 1;
     }

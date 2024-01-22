@@ -75,20 +75,17 @@ void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
     snprintf(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (id INT AUTO_INCREMENT PRIMARY KEY)", tableName);
 
     if (mysql_query(conn, query) == 0) {
-        printf("\n\n\t\t\tTable '%s' created successfully.\n", tableName);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyRenderer(renderer2);
         SDL_DestroyWindow(window);
         return;
     } else {
-        fprintf(stderr, "\n\n\t\t\tError creating table: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyRenderer(renderer2);
         SDL_DestroyWindow(window);
         return;
     }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }

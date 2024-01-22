@@ -5,10 +5,9 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
 
     SDL_RenderClear(renderer);
 
-    SDL_Rect usernameRect = { 520, 425, 100, 30 };
-    SDL_Rect passwordRect = { 520, 625, 100, 30 };
+    SDL_Rect usernameRect = { 590, 575, 125, 50 };
+    SDL_Rect passwordRect = { 590, 775, 125, 50 };
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderFillRect(renderer, &usernameRect);
     SDL_RenderFillRect(renderer, &passwordRect);
 
@@ -17,31 +16,14 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/password.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
-    SDL_Rect option1Rect = {550, 200, 400, 100};
-    SDL_Rect option2Rect = {500, 350, 250, 70};
-    SDL_Rect option3Rect = {500, 550, 250, 70};
-    // SDL_Rect option0Rect = {1300, 700, 150, 50};
-    
-    //SDL_Rect textRect = { 50, 60, 300, 30 };
+    SDL_Rect option1Rect = {750, 300, 400, 125};
+    SDL_Rect option2Rect = {575, 500, 250, 70};
+    SDL_Rect option3Rect = {575, 700, 250, 70};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
-    SDL_Color textColor = { 255, 255, 255 };
+    SDL_Color textColor = { 0, 0, 0 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    // SDL_Color color = {255, 255, 255, 255};
-    /*textSurface = TTF_RenderText_Solid(font, "Enter Student's Username:", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    textRect.y = 300;
-
-    textSurface = TTF_RenderText_Solid(font, "Enter Student's Password:", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    SDL_RenderPresent(renderer);*/
 
     SDL_Event event;
 
@@ -50,7 +32,6 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
     char username[50];
     char password[20];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(username, 0, sizeof(username));
     memset(password, 0, sizeof(password));
     
@@ -66,7 +47,6 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
                 SDL_DestroyTexture(option1Texture);
                 SDL_DestroyTexture(option2Texture);
                 SDL_DestroyTexture(option3Texture);
-                // SDL_DestroyTexture(option0Texture);
                 *connect = 0;
                 return *connect;
             } else if (event.type == SDL_KEYDOWN) {
@@ -83,8 +63,8 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
                 } else {
                     strcat(password, event.text.text);
                 }
-                
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
                 SDL_RenderFillRect(renderer, &usernameRect);
                 SDL_RenderFillRect(renderer, &passwordRect);
 
@@ -93,7 +73,6 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
                 SDL_FreeSurface(textSurface);
                 SDL_RenderCopy(renderer, textTexture, NULL, &usernameRect);
 
-                // Afficher des étoiles pour le mot de passe
                 size_t passwordLength = strlen(password);
                 char maskedPassword[passwordLength + 1];
                 memset(maskedPassword, '*', passwordLength);
@@ -110,46 +89,33 @@ int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassw
 
         SDL_Delay(10);
 
-        // SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
-
         SDL_RenderPresent(renderer);
     }
 
     FILE *fp = fopen("bdd/studentInfo.bin", "rb");
 
-    if (fp == NULL)
-    {
-        printf("\n\t\t\tError !\n");
+    if (fp == NULL) {
+        errorAccount(renderer);
     }
 
     while (fread(&studentInformation, sizeof(studentInformation), 1, fp) == 1) {
-
-        printf("\n\t\t\tRead username: %s\n", studentInformation.studentUsername);
-        printf("\t\t\tRead password: %s\n", studentInformation.studentPassword);
-
         if (strcasecmp(username, studentInformation.studentUsername) == 0 && strcmp(password, studentInformation.studentPassword) == 0) {
             *connect = 1;
-            printf("\n\n\t\t\tLogin Successful!\n");
 
             strcpy(loggedInUsername, username);
             strcpy(loggedInPassword, password);
-
-            printf("\n\t\t\ttkt: %s\n", loggedInUsername);
-            printf("\t\t\ttkt: %s\n", loggedInPassword);
-
+            
             fclose(fp);
             return *connect;
         }
     }
-    printf("\n\n\t\t\tLogin failed. Please try again.\n");
-    printf("\n\n\t\t\tEnter any keys to continue.......");
-
     
+    errorAccount(renderer);
+        
     SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
-    // SDL_DestroyTexture(option0Texture);
 
     *connect = 0;
     fclose(fp);

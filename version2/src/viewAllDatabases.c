@@ -5,7 +5,7 @@ int viewAllDatabases(SDL_Renderer *renderer) {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
-        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        errorDatabase(renderer);
         return EXIT_FAILURE;
     }
         
@@ -13,13 +13,13 @@ int viewAllDatabases(SDL_Renderer *renderer) {
 
         const char *query = "SHOW DATABASES";
         if (mysql_query(conn, query) != 0) {
-            fprintf(stderr, "Error fetching databases: %s\n", mysql_error(conn));
+            errorDatabase(renderer);
             return 0;
         }
 
         MYSQL_RES *result = mysql_store_result(conn);
         if (result == NULL) {
-            fprintf(stderr, "Error fetching database result: %s\n", mysql_error(conn));
+            errorDatabase(renderer);
             return 0;
         }
 
@@ -56,12 +56,11 @@ int viewAllDatabases(SDL_Renderer *renderer) {
             SDL_FreeSurface(textSurface);
             SDL_DestroyTexture(textTexture);
 
-            textRect.x += 250;  // Espacement entre chaque base de données
+            textRect.x += 250;
 
-            // Si la nouvelle position X dépasse la largeur de la fenêtre, passez à la ligne suivante
             if (textRect.x + textRect.w > 1500) {
-                textRect.x = 50;  // Réinitialisez la position X
-                textRect.y += 40;  // Passez à la ligne suivante
+                textRect.x = 50;
+                textRect.y += 40;
             }
         }
 
@@ -91,8 +90,7 @@ int viewAllDatabases(SDL_Renderer *renderer) {
         SDL_DestroyRenderer(renderer);
         return 0;
     } else {
-        fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
-        printf("\n\n\t\t\tEnter any keys to continue.......");
+        errorDatabase(renderer);
         mysql_close(conn);
         return 1;
     }

@@ -91,7 +91,6 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
     snprintf(query, sizeof(query), "ALTER TABLE %s ADD COLUMN %s %s", tableName, columnName, columnType);
 
     if (mysql_query(conn, query) == 0) {
-        printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -99,7 +98,7 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
         SDL_DestroyWindow(window);
         return 0;
     } else {
-        fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -107,6 +106,4 @@ int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Render
         SDL_DestroyWindow(window);
         return 0;
     }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }

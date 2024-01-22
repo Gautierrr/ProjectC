@@ -9,32 +9,25 @@ int createDatabase(char *loggedInUsername) {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
-        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        errorDatabase(renderer);
         return 1;
     }
 
     if (mysql_real_connect(conn, "localhost", "root", "root", NULL, 3306, NULL, 0)) {
         SDL_RenderClear(renderer);
 
-        SDL_Rect databaseRect = { 40, 200, 100, 25 };  // Adjusted position for a smaller window
+        SDL_Rect databaseRect = { 50, 250, 150, 30 };
 
         SDL_RenderFillRect(renderer, &databaseRect);
 
-        // SDL_Rect textRect = { 50, 325, 150, 25 };  // Adjusted position for a smaller window
-
         SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createDatabaseName.png");
         SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/background3.png");
-        SDL_Rect option1Rect = {30, 125, 200, 60};
+        SDL_Rect option1Rect = {30, 125, 400, 100};
 
         SDL_Surface *textSurface;
         SDL_Texture *textTexture;
-        SDL_Color textColor = { 255, 255, 255 };
+        SDL_Color textColor = { 0, 0, 0 };
         TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-        /*textSurface = TTF_RenderText_Solid(font, "Enter Database name : ", textColor);
-        textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-        SDL_FreeSurface(textSurface);
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-        SDL_RenderPresent(renderer);*/
 
         SDL_Event event;
 
@@ -42,7 +35,6 @@ int createDatabase(char *loggedInUsername) {
         int isTypingUsername = 1;
         char oldDbName[100];
 
-        // Initialiser les chaînes de caractères à zéro
         memset(oldDbName, 0, sizeof(oldDbName));
 
         SDL_RenderClear(renderer);
@@ -73,6 +65,7 @@ int createDatabase(char *loggedInUsername) {
                 } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
                     strcat(oldDbName, event.text.text);
 
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
                     SDL_RenderFillRect(renderer, &databaseRect);
 
                     textSurface = TTF_RenderText_Solid(font, oldDbName, textColor);
@@ -97,25 +90,18 @@ int createDatabase(char *loggedInUsername) {
         snprintf(query, sizeof(query), "CREATE DATABASE %s", dbName);
 
         if (mysql_query(conn, query) == 0) {
-            printf("\n\n\t\t\tDatabase '%s' created successfully.\n", dbName);
-            printf("\n\n\t\t\tEnter any keys to continue.......");
+            mysql_close(conn);
+            SDL_DestroyTexture(option1Texture);
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            return 0;
         } else {
-            fprintf(stderr, "\n\n\t\t\tError creating database: %s\n", mysql_error(conn));
-            printf("\n\n\t\t\tEnter any keys to continue.......");
+            errorDatabase(renderer);
         }
 
-        // databaseMenu(conn, renderer, dbName);
-
-        mysql_close(conn);
-        SDL_DestroyTexture(option1Texture);
-        SDL_DestroyTexture(backgroundTexture);
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        return 0;
-
     } else {
-        fprintf(stderr, "\n\n\t\t\tFailed to connect to MySQL server: %s\n", mysql_error(conn));
-        printf("\n\n\t\t\tEnter any keys to continue.......");
+        errorDatabase(renderer);
         mysql_close(conn);
         return 1;
     }

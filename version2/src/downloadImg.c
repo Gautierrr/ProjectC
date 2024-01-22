@@ -1,11 +1,9 @@
 #include "../main.h"
 
-// Fonction de rappel pour gérer les données reçues
 size_t write_callback(void *contents, size_t size, size_t nmemb, FILE *userp) {
     return fwrite(contents, size, nmemb, userp);
 }
 
-// Fonction pour télécharger une image depuis une URL
 void download_image(const char *url, const char *output_file) {
     CURL *curl;
     CURLcode res;
@@ -32,43 +30,28 @@ void download_image(const char *url, const char *output_file) {
         // Effectuer la requête
         res = curl_easy_perform(curl);
 
-        // Gérer les erreurs
         if (res != CURLE_OK)
             fprintf(stderr, "Erreur de curl_easy_perform : %s\n", curl_easy_strerror(res));
 
-        // Libérer la ressource CURL
         curl_easy_cleanup(curl);
     }
 
     curl_global_cleanup();
-
-    // Fermer le fichier
     fclose(fp);
 }
 
 int downloadImg(SDL_Renderer *renderer){
-    // URL de l'image
     const char *image_url = "https://scontent-cdg4-2.xx.fbcdn.net/v/t39.30808-6/386081292_18018561505825160_4212432463964703339_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=3635dc&_nc_ohc=noZ1vPI315IAX8JKBbP&_nc_ht=scontent-cdg4-2.xx&oh=00_AfA7uAD1FBqTqMcJGLW6Gr_4yq5eVUnVQ5FkRtNfdheyHg&oe=65B293AA";
-    
-    // Nom du fichier de sortie
     const char *output_file = "download_image.jpg";
-
-    // Télécharger l'image
     download_image(image_url, output_file);
 
-    printf("L'image a ete telechargee avec succes. Nom du fichier : %s\n", output_file);
-
-
-
-
-    // Affichage de l'image
-
+    // l'afficher
     SDL_RenderClear(renderer);
 
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "download_image.jpg");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
-    SDL_Rect option1Rect = {300, 200, 720, 720};
+    SDL_Rect option1Rect = {600, 260, 720, 720};
 
     SDL_Event event;
 

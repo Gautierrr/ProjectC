@@ -20,25 +20,22 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
-        fprintf(stderr, "\n\n\t\t\tMySQL connection initialization error\n");
+        errorDatabase(renderer);
         return EXIT_FAILURE;
     }
-
     SDL_RenderClear(renderer2);
 
-    SDL_Rect databaseRect = { 40, 200, 100, 25 };  // Adjusted position for a smaller window
+    SDL_Rect databaseRect = { 50, 250, 150, 30 };
 
     SDL_RenderFillRect(renderer2, &databaseRect);
 
-    // SDL_Rect textRect = { 50, 325, 150, 25 };  // Adjusted position for a smaller window
-
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer2, "img/loadDatabaseName.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer2, "img/background3.png");
-    SDL_Rect option1Rect = {30, 125, 200, 60};
+    SDL_Rect option1Rect = {30, 125, 400, 100};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
-    SDL_Color textColor = { 255, 255, 255 };
+    SDL_Color textColor = { 0, 0, 0 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
 
     SDL_Event event;
@@ -62,7 +59,6 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
                 SDL_DestroyTexture(backgroundTexture);
                 SDL_DestroyRenderer(renderer2);
                 SDL_DestroyWindow(window);
-                mysql_close(conn);
                 return 0;
             } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
                 done = 1;
@@ -77,7 +73,7 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
             } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
                 strcat(oldDbName, event.text.text);
 
-                SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+                SDL_SetRenderDrawColor(renderer2, 255, 255, 255, 0);
                 SDL_RenderFillRect(renderer2, &databaseRect);
 
                 textSurface = TTF_RenderText_Solid(font, oldDbName, textColor);
@@ -105,33 +101,24 @@ int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
     }    
 
     if (isEssentialDatabase2(dbName)) {
-        printf("Error: Cannot delete essential database '%s'.\n", dbName);
+        errorDatabase(renderer);
     } else {
         if (mysql_real_connect(conn, "localhost", "root", "root", dbName, 3306, NULL, 0))
-        {
-            printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
-            printf("\n\n\t\t\tEnter any keys to continue.......");
-            
+        {            
             SDL_DestroyTexture(option1Texture);
             SDL_DestroyTexture(backgroundTexture);
             SDL_DestroyRenderer(renderer2);
             SDL_DestroyWindow(window);
 
             databaseMenu(conn, renderer, dbName, renderer2);
-
-            mysql_close(conn);
             return 0;
-        }
-        else
-        {
-            fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
-            printf("\n\n\t\t\tEnter any keys to continue.......");
+        } else {
+            errorDatabase(renderer);
             
             SDL_DestroyTexture(option1Texture);
             SDL_DestroyTexture(backgroundTexture);
             SDL_DestroyRenderer(renderer2);
             SDL_DestroyWindow(window);
-            mysql_close(conn);
             return 0;
         }
     }

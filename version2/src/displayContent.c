@@ -4,23 +4,20 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
     char query[512];
     MYSQL_RES *result;
 
-    // Construire la requête SQL pour afficher toutes les colonnes et valeurs
     snprintf(query, sizeof(query), "SELECT * FROM %s.%s", dbName, tableName);
 
     if (mysql_query(conn, query) != 0) {
-        fprintf(stderr, "Error querying database: %s\n", mysql_error(conn));
+        errorTable(renderer);
         return 1;
     }
 
-    // Récupérer les résultats de la requête
     result = mysql_store_result(conn);
 
     if (result == NULL) {
-        fprintf(stderr, "Error fetching table content: %s\n", mysql_error(conn));
+        errorTable(renderer);
         return 1;
     }
 
-    // Récupérer le nombre de colonnes
     int numFields = mysql_num_fields(result);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -52,13 +49,12 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
         SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
         SDL_DestroyTexture(textTexture);
 
-        currentX += 120;  // Ajustez la valeur pour l'espacement entre les colonnes
+        currentX += 120;
     }
 
-    // Afficher les valeurs de chaque ligne dans la fenêtre graphique
-    int currentY = 380;  // Ajustez la valeur pour l'espacement vertical entre les lignes
-    int lineHeight = 20;  // Hauteur de chaque ligne
-    int columnWidth = 80;  // Largeur de chaque colonne
+    int currentY = 380;
+    int lineHeight = 20;
+    int columnWidth = 80;
 
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result))) {
@@ -74,21 +70,19 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
             SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
             SDL_DestroyTexture(textTexture);
 
-            currentX += 120;  // Ajoutez une marge de 10 pixels entre chaque colonne
+            currentX += 120;
         }
 
-        currentY += lineHeight + 20;  // Ajustez la valeur pour l'espacement vertical entre les lignes
+        currentY += lineHeight + 20;
 
-        // Si la nouvelle position Y dépasse la hauteur de la fenêtre, passez à la ligne suivante
         if (currentY + lineHeight > 780) {
-            currentY = 380;  // Réinitialisez la position Y
-            currentX += columnWidth + 50;  // Passez à la droite de la première partie de la liste
+            currentY = 380;
+            currentX += columnWidth + 50;
         }
     }
 
     SDL_RenderPresent(renderer);
 
-    // Attendre que l'utilisateur ferme la fenêtre
     int quit = 0;
     SDL_Event event;
 
@@ -101,7 +95,6 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
         SDL_Delay(10);
     }
 
-    // Libérer la mémoire
     mysql_free_result(result);
     TTF_CloseFont(font);
 

@@ -82,10 +82,12 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int viewAllDatabases(SDL_Renderer *renderer);
 int deleteDatabase(SDL_Renderer *renderer);
-
 int downloadImg(SDL_Renderer *renderer);
 
-
+void errorAccount(SDL_Renderer *renderer);
+void errorDatabase(SDL_Renderer *renderer);
+void errorTable(SDL_Renderer *renderer);
+void errorContent(SDL_Renderer *renderer);
 
 
 

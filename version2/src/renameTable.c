@@ -96,7 +96,6 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
     snprintf(query, sizeof(query), "RENAME TABLE %s TO %s", oldTableName, newTableName);
 
     if (mysql_query(conn, query) == 0) {
-        printf("\n\n\t\t\tTable '%s' renamed to '%s' successfully.\n", oldTableName, newTableName);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -104,7 +103,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
         SDL_DestroyWindow(window);
         return;
     } else {
-        fprintf(stderr, "\n\n\t\t\tError renaming table: %s\n", mysql_error(conn));
+        errorTable(renderer2);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyTexture(option2Texture);
         SDL_DestroyTexture(backgroundTexture);
@@ -112,6 +111,4 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
         SDL_DestroyWindow(window);
         return;
     }
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
 }

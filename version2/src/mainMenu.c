@@ -10,10 +10,10 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
     SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
-    SDL_Rect option1Rect = {550, 300, 400, 100};
-    SDL_Rect option2Rect = {550, 450, 400, 100};
-    SDL_Rect option3Rect = {550, 600, 400, 100};
-    SDL_Rect option0Rect = {1300, 700, 150, 50};
+    SDL_Rect option1Rect = {750, 300, 400, 100};
+    SDL_Rect option2Rect = {750, 500, 400, 100};
+    SDL_Rect option3Rect = {750, 700, 400, 100};
+    SDL_Rect option0Rect = {1700, 925, 150, 50};
 
 
     char option;

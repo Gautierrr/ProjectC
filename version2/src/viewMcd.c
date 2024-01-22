@@ -224,13 +224,13 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                 mysql_free_result(result);
                 return 0;
             } else {
-                fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
+                errorTable(renderer);
             }
         } else {
-            fprintf(stderr, "\n\t\t\tError querying database: %s\n", mysql_error(conn));
+            errorDatabase(renderer);
         }
     } else {
-        fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
+        errorDatabase(renderer);
     }
 
     SDL_DestroyRenderer(renderer);

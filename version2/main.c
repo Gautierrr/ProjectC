@@ -29,8 +29,8 @@ int SDL_main(int argc, char *argv[]) {
     SDL_Rect option1Rect = {40, 30, 150, 50};
     SDL_Rect option2Rect = {250, 30, 150, 50};
     SDL_Rect option3Rect = {600, 7, 650, 95};
-    SDL_Rect option4Rect = {100, 500, 450, 450};
-    SDL_Rect option0Rect = {1300, 700, 150, 50};
+    SDL_Rect option4Rect = {80, 500, 350, 350};
+    SDL_Rect option0Rect = {1700, 925, 150, 50};
 
 
     char option;
@@ -60,7 +60,6 @@ int SDL_main(int argc, char *argv[]) {
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
                         result = authentificateUser(&connect, loggedInUsername, loggedInPassword, renderer);
-                        printf("Connect value after authentication: %d\n", connect);
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
@@ -70,9 +69,6 @@ int SDL_main(int argc, char *argv[]) {
                             } else {
                                 mainMenu(loggedInUsername, loggedInPassword, renderer);
                             }
-                        } else {
-                            printf("\n\n\t\t\tYou must be logged in to access the main menu.");
-                            printf("\n\n\t\t\tEnter any keys to continue.......");
                         }
                         result = 0;
                     } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
@@ -82,7 +78,6 @@ int SDL_main(int argc, char *argv[]) {
                     } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
-                        printf("\n\t\t\t====== Thank You ======");
                     }
                 }
                 break;

@@ -36,9 +36,9 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 int currentY = beginning;
                 int maxTableHeight = 0;
 
-                SDL_Rect inputRect1 = {500, 75, 150, 30};  // Rect pour le champ de saisie de la colonne à modifier
-                SDL_Rect inputRect2 = {500, 255, 150, 30};  // Rect pour le champ de saisie du nouveau nom
-                SDL_Rect inputRect3 = {500, 375, 150, 30};  // Rect pour le champ de saisie du nouveau type
+                SDL_Rect inputRect1 = {500, 75, 150, 30};
+                SDL_Rect inputRect2 = {500, 255, 150, 30};
+                SDL_Rect inputRect3 = {500, 375, 150, 30};
 
                 char columnName[100];
                 char newColumnName[100];
@@ -237,7 +237,6 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 snprintf(query, sizeof(query), "ALTER TABLE %s CHANGE COLUMN %s %s %s", tableName, columnName, newColumnName, newColumnType);
 
                 if (mysql_query(conn, query) == 0) {
-                    printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
                     SDL_DestroyTexture(backgroundTexture);
                     SDL_DestroyTexture(option1Texture);
                     SDL_DestroyTexture(option2Texture);
@@ -246,7 +245,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                     SDL_DestroyWindow(window);
                     return 0;
                 } else {
-                    fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
+                    errorTable(renderer2);
                 }
                 SDL_DestroyTexture(backgroundTexture);
                 SDL_DestroyTexture(option1Texture);
@@ -256,13 +255,13 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 SDL_DestroyWindow(window);
                 return 0;
             } else {
-                fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
+                errorTable(renderer2);
             }
         } else {
-            fprintf(stderr, "\n\t\t\tError querying database: %s\n", mysql_error(conn));
+            errorDatabase(renderer2);
         }
     } else {
-        fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
+        errorDatabase(renderer2);
     }
     return 0;
 }
