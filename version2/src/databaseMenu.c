@@ -1,21 +1,25 @@
 #include "../main.h"
 
-void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
+void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_Renderer *renderer2) {
+
+    SDL_RenderClear(renderer);
+
     SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/viewTables.png");
     SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/mcd.png");
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/createTable.png");
     SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/renameTable.png");
     SDL_Texture *option5Texture = IMG_LoadTexture(renderer, "img/editTable.png");
     SDL_Texture *option6Texture = IMG_LoadTexture(renderer, "img/deleteTable.png");
-    SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/returnMenu.png");
+    SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
-    SDL_Rect option1Rect = {200, 50, 400, 40};
-    SDL_Rect option2Rect = {200, 125, 400, 40};
-    SDL_Rect option3Rect = {200, 200, 400, 40};
-    SDL_Rect option4Rect = {150, 250, 500, 40};
-    SDL_Rect option5Rect = {150, 350, 500, 50};
-    SDL_Rect option6Rect = {150, 450, 500, 50};
-    SDL_Rect option0Rect = {150, 550, 500, 50};
+    SDL_Rect option1Rect = {150, 200, 300, 100};
+    SDL_Rect option2Rect = {150, 350, 300, 100};
+    SDL_Rect option3Rect = {150, 500, 300, 100};
+    SDL_Rect option4Rect = {1025, 200, 300, 100};
+    SDL_Rect option5Rect = {1025, 350, 300, 100};
+    SDL_Rect option6Rect = {1025, 500, 300, 100};
+    SDL_Rect option0Rect = {1300, 700, 150, 50};
 
     char option;
 
@@ -32,7 +36,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
                     if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
                         mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
                         option = '1';
-                        displayAllTables(conn, dbName, renderer);
+                        displayAllTables(conn, dbName, renderer, renderer2);
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
@@ -64,6 +68,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
 
         SDL_RenderClear(renderer);
 
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
         SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
@@ -75,6 +80,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
         SDL_RenderPresent(renderer);
     }
 
+    SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
@@ -84,5 +90,4 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName) {
     SDL_DestroyTexture(option0Texture);
 
     SDL_DestroyRenderer(renderer);
-    SDL_Quit();
 }

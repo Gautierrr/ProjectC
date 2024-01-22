@@ -1132,3 +1132,56 @@ stateConnect(int *connect)
     printf("\n\n\t\t\tEnter any keys to continue.......");
     getch();
 }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// main
+// createAccount
+// authentificationUser
+// maineMenu
+// createDatabase
+// loadDatabase
+// changeSettings
+// databaseMenu
+// displayAllTables
+// clickTable
+// viewMcd
+
+
+
+
+
+// faire partie admin !!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

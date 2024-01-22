@@ -20,8 +20,8 @@ int isUsernameTaken2(const char *username, char *currentUsername) {
     return 0;
 }
 
-void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer)
-{
+void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer) {
+
     Student currentUser;
 
     FILE *fp = fopen("bdd/studentInfo.bin", "rb+");
@@ -49,12 +49,23 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_Rect usernameRect = {50, 150, 200, 30};
-    SDL_Rect passwordRect = {50, 350, 200, 30};
+    SDL_Rect usernameRect = { 520, 425, 100, 30 };
+    SDL_Rect passwordRect = { 520, 625, 100, 30 };
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderFillRect(renderer, &usernameRect);
     SDL_RenderFillRect(renderer, &passwordRect);
+
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/pageSettings.png");
+    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/StudentU.png");
+    SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/studentP.png");
+    SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/adminP.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
+
+    SDL_Rect option1Rect = {550, 200, 400, 100};
+    SDL_Rect option2Rect = {500, 350, 400, 100};
+    SDL_Rect option3Rect = {500, 550, 400, 100};
+    SDL_Rect option4Rect = {500, 350, 400, 100};
 
     SDL_Rect textRect = {50, 100, 300, 30};
 
@@ -71,28 +82,17 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     textRect.y = 60;*/
 
     // If the user is admin, allow changing only the password
-    if (strcmp(currentUsername, "admin") == 0)
-    {
-        textSurface = TTF_RenderText_Solid(font, "Enter your new Admin Password:", textColor);
-        SDL_Rect passwordRect = {50, 200, 200, 30};
-    }
-    else
-    {
-        textSurface = TTF_RenderText_Solid(font, "Enter your new Student Username:", textColor);
-    }
-
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    textRect.y = 300;
-
-    if (strcmp(currentUsername, "admin") != 0)
-    {
-        textSurface = TTF_RenderText_Solid(font, "Enter your new Student Password:", textColor);
-        textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-        SDL_FreeSurface(textSurface);
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    if (strcmp(currentUsername, "admin") == 0) {
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+        SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
+        SDL_Rect passwordRect = {500, 425, 200, 30};
+    } else {
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+        SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
+        SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
+    
     }
 
     SDL_RenderPresent(renderer);
@@ -110,12 +110,20 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
     {
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
-            {
-                done = 1;
-            }
-            else if (event.type == SDL_KEYDOWN)
-            {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {                
+                if (strcmp(currentUsername, "admin") == 0) {
+                    SDL_DestroyTexture(backgroundTexture);
+                    SDL_DestroyTexture(option1Texture);
+                    SDL_DestroyTexture(option4Texture);
+                    done = 1;
+                } else {
+                    SDL_DestroyTexture(backgroundTexture);
+                    SDL_DestroyTexture(option1Texture);
+                    SDL_DestroyTexture(option2Texture);
+                    SDL_DestroyTexture(option3Texture);
+                    done = 1;                
+                }
+            } else if (event.type == SDL_KEYDOWN) {
                 if (strcmp(currentUsername, "admin") == 0) { 
                     if (event.key.keysym.sym == SDLK_RETURN) {
                         done = 1;
@@ -188,6 +196,16 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
             printf("\n\n\t\t\tUser not found. Please check your current username and password.\n");
         }
 
-        fclose(fp);
+        fclose(fp);                
+        if (strcmp(currentUsername, "admin") == 0) {
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyTexture(option1Texture);
+            SDL_DestroyTexture(option4Texture);
+        } else {
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyTexture(option1Texture);
+            SDL_DestroyTexture(option2Texture);
+            SDL_DestroyTexture(option3Texture);        
+        }
     }
 }

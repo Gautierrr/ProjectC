@@ -1,6 +1,6 @@
 #include "../main.h"
 
-int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
+int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2) {
     if (mysql_select_db(conn, dbName) == 0) {
         char query[200];
         snprintf(query, sizeof(query),
@@ -16,27 +16,34 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                 Link links[50];
                 int numLinks = 0;
 
-                ForeignKey foreignKeys[50];
-                int numForeignKeys = 0;
-
                 TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 18);
-                SDL_Color textColor = {255, 255, 255};
+                SDL_Color textColor = {0, 0, 0};
+                SDL_Color textColor2 = {255, 255, 255};
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderClear(renderer);
 
-                SDL_Rect textRect = {50, 60, 300, 30};
+                SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/allTables.png");
+                SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
+                SDL_Rect option1Rect = {550, 200, 450, 150};
+
+                SDL_RenderClear(renderer);
+                SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+                SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+                SDL_RenderPresent(renderer);
+
+                SDL_Rect textRect = {50, 350, 300, 30};
                 SDL_Surface *textSurface;
                 SDL_Texture *textTexture;
                 MYSQL_ROW row;
 
-                int screenWidth = 800;
+                int screenWidth = 1500;
                 int tableWidth = 200;
                 int tableHeight = 40;
                 int margin = 40;
+                int beginning = 350;
 
                 int currentX = margin;
-                int currentY = margin;
+                int currentY = beginning;
                 int maxTableHeight = 0;
 
                 while (row = mysql_fetch_row(result)) {
@@ -50,10 +57,11 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                     }
 
                     SDL_Rect tableRect = {tables[numTables].x, tables[numTables].y, tableWidth, tableHeight};
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
                     SDL_RenderDrawRect(renderer, &tableRect);
                     SDL_RenderFillRect(renderer, &tableRect);
 
-                    textSurface = TTF_RenderText_Solid(font, tables[numTables].name, textColor);
+                    textSurface = TTF_RenderText_Solid(font, tables[numTables].name, textColor2);
                     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
                     SDL_FreeSurface(textSurface);
 
@@ -76,10 +84,10 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 
                             int numColumns = mysql_num_rows(columnResult);
 
-                            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
                             SDL_Rect entityRect = {tables[numTables].x, tables[numTables].y, tableWidth, tableHeight + numColumns * 30 + 50};
                             SDL_RenderDrawRect(renderer, &entityRect);
-                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 
                             MYSQL_ROW columnRow;
 
@@ -148,7 +156,12 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 
                 while (!quit) {
                     while (SDL_PollEvent(&event)) {
-                        if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+                        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
+                            mysql_free_result(result);
+                            SDL_DestroyTexture(backgroundTexture);
+                            SDL_DestroyTexture(option1Texture);
+                            SDL_DestroyRenderer(renderer);
+                            quit = 1;
                             return 0;
                         } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                             // Vérifier si le clic est à l'intérieur de l'une des tables
@@ -156,12 +169,15 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                                 int tableX = tables[i].x;
                                 int tableY = tables[i].y;
                                 int tableWidth = 200;  // Ajustez la largeur de la table
-                                int tableHeight = maxTableHeight + tableHeight + margin * 2;  // Ajustez la hauteur de la table
+                                int tableHeight;  // Ajustez la hauteur de la table
 
                                 if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
                                     event.button.y >= tableY && event.button.y <= tableY + tableHeight) {
                                     int modificationSuccessful = clickTable(conn, dbName, tables[i].name, renderer);
                                     if (modificationSuccessful) {
+                                        SDL_DestroyTexture(backgroundTexture);
+                                        SDL_DestroyTexture(option1Texture);
+                                        SDL_DestroyRenderer(renderer);
                                         return 0;
                                     }
                                 }
@@ -170,7 +186,11 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                     }
                     SDL_Delay(10);
                 }
+                SDL_DestroyTexture(backgroundTexture);
+                SDL_DestroyTexture(option1Texture);
+                SDL_DestroyRenderer(renderer);
                 mysql_free_result(result);
+                return 0;
             } else {
                 fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
             }
@@ -182,5 +202,4 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     }
 
     SDL_DestroyRenderer(renderer);
-    SDL_Quit();
 }

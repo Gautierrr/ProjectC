@@ -34,7 +34,7 @@ int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rend
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
-                        loadDatabase(renderer, loggedInUsername);
+                        loadDatabase(loggedInUsername, renderer);
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';

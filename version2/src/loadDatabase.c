@@ -11,7 +11,12 @@ int isEssentialDatabase2(const char *dbName) {
     return 0;
 }
 
-int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
+int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer) {
+
+    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_RESIZABLE);
+    SDL_Renderer *renderer2 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_RenderClear(renderer2);
+
     MYSQL *conn = mysql_init(NULL);
 
     if (conn == NULL) {
@@ -19,26 +24,22 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
         return EXIT_FAILURE;
     }
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(renderer2);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect databaseRect = { 40, 200, 100, 25 };  // Adjusted position for a smaller window
 
-    SDL_Rect databaseRect = { 50, 200, 200, 30 };
+    SDL_RenderFillRect(renderer2, &databaseRect);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &databaseRect);
+    // SDL_Rect textRect = { 50, 325, 150, 25 };  // Adjusted position for a smaller window
 
-    SDL_Rect textRect = { 50, 100, 300, 30 };
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer2, "img/loadDatabaseName.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer2, "img/background3.png");
+    SDL_Rect option1Rect = {30, 125, 200, 60};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    textSurface = TTF_RenderText_Solid(font, "Enter the name of the database to load : ", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);SDL_RenderPresent(renderer);
 
     SDL_Event event;
 
@@ -48,10 +49,21 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
 
     memset(oldDbName, 0, sizeof(oldDbName));
 
+    SDL_RenderClear(renderer2);
+    SDL_RenderCopy(renderer2, backgroundTexture, NULL, NULL);        
+    SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
+    SDL_RenderPresent(renderer2);
+
     while (!done) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 done = 1;
+                SDL_DestroyTexture(option1Texture);
+                SDL_DestroyTexture(backgroundTexture);
+                SDL_DestroyRenderer(renderer2);
+                SDL_DestroyWindow(window);
+                mysql_close(conn);
+                return 0;
             } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
                 done = 1;
             } else if (event.type == SDL_KEYDOWN) {
@@ -65,15 +77,15 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
             } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
                 strcat(oldDbName, event.text.text);
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                SDL_RenderFillRect(renderer, &databaseRect);
+                SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer2, &databaseRect);
 
                 textSurface = TTF_RenderText_Solid(font, oldDbName, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
                 SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &databaseRect);
+                SDL_RenderCopy(renderer2, textTexture, NULL, &databaseRect);
 
-                SDL_RenderPresent(renderer);
+                SDL_RenderPresent(renderer2);
             }
         }
 
@@ -99,8 +111,13 @@ int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername) {
         {
             printf("\n\n\t\t\tConnection to database '%s' successful.\n", dbName);
             printf("\n\n\t\t\tEnter any keys to continue.......");
+            
+            SDL_DestroyTexture(option1Texture);
+            SDL_DestroyTexture(backgroundTexture);
+            SDL_DestroyRenderer(renderer2);
+            SDL_DestroyWindow(window);
 
-            databaseMenu(conn, renderer, dbName);
+            databaseMenu(conn, renderer, dbName, renderer2);
 
             mysql_close(conn);
             return 0;

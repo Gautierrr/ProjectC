@@ -61,12 +61,16 @@ void createAccount(SDL_Renderer *renderer);
 int authentificateUser(int *connect, char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *renderer);
-// int testMySQLConnection(SDL_Renderer *renderer);
-int createDatabase(SDL_Renderer *renderer, char *loggedInUsername);             // pour savoir a qui appartient la bdd =   mabdd/username  ->  ex   coucou/gautier
-int loadDatabase(SDL_Renderer *renderer, char *loggedInUsername);               // comme ca identification de qui peux modifier tel et tel bdd
-void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName);
-int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+int createDatabase(char *loggedInUsername);
+int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer);
+void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_Renderer *renderer2);
+int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2);
+int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+
+// display + viewMcd doivent pouvoir se fermer
+
+
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
@@ -76,7 +80,6 @@ void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName,
 
 
 
-int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 // int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
 int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
@@ -98,6 +101,12 @@ int deleteDatabase(SDL_Renderer *renderer);
 // #################           Voir pour le MCD           #################
 // #################                                      #################
 // ########################################################################
+
+
+
+
+
+
 
 
 #endif

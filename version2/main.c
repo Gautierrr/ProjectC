@@ -3,7 +3,7 @@
 int SDL_main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, 0);
+    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1500, 780, SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);    
     
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -15,17 +15,20 @@ int SDL_main(int argc, char *argv[]) {
         fprintf(stderr, "SDL_ttf initialization failed: %s\n", TTF_GetError());
         SDL_Quit();
         return 1;
-    }
+    }    
 
-    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/createAnAccount.png");
-    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/logAccount.png");
+    SDL_RenderClear(renderer);
+
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/signUp.png");
+    SDL_Texture *option2Texture = IMG_LoadTexture(renderer, "img/logIn.png");
     SDL_Texture *option3Texture = IMG_LoadTexture(renderer, "img/accessDatabaseMenu.png");
     SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/background1.jpg");
 
-    SDL_Rect option1Rect = {200, 100, 400, 40};
-    SDL_Rect option2Rect = {200, 200, 400, 40};
-    SDL_Rect option3Rect = {150, 300, 500, 50};
-    SDL_Rect option0Rect = {325, 400, 150, 50};
+    SDL_Rect option1Rect = {40, 30, 150, 50};
+    SDL_Rect option2Rect = {250, 30, 150, 50};
+    SDL_Rect option3Rect = {600, 7, 650, 95};
+    SDL_Rect option0Rect = {1300, 700, 150, 50};
 
 
     char option;
@@ -81,6 +84,7 @@ int SDL_main(int argc, char *argv[]) {
 
         SDL_RenderClear(renderer);
 
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);
         SDL_RenderCopy(renderer, option3Texture, NULL, &option3Rect);
@@ -89,10 +93,12 @@ int SDL_main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
 
+    SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyTexture(option1Texture);
     SDL_DestroyTexture(option2Texture);
     SDL_DestroyTexture(option3Texture);
     SDL_DestroyTexture(option0Texture);
+
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
