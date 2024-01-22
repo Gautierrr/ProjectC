@@ -68,27 +68,27 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2);
-void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2);
+void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2);
+int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2);
+int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
+int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
+void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2); // -> Id en auto-Increment donc impossible de changer de clé primaires
+void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
+int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
+int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
+int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 
 
-int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 
 
 
 // int modifyColumn(MYSQL *conn, const char *dbName, const char *tableName, const char *columnName);
-int editTableMenu(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-void addPrimaryKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-void addForeignKey(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 // int editContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-int addColumn(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
-int deleteContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 int adminMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *renderer);
 int viewAllDatabases(SDL_Renderer *renderer);
 int deleteDatabase(SDL_Renderer *renderer);

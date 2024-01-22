@@ -50,7 +50,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
 
     while (!done) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 SDL_DestroyTexture(option1Texture);
                 SDL_DestroyTexture(option2Texture);
                 SDL_DestroyTexture(backgroundTexture);
@@ -102,6 +102,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyRenderer(renderer2);
         SDL_DestroyWindow(window);
+        return;
     } else {
         fprintf(stderr, "\n\n\t\t\tError renaming table: %s\n", mysql_error(conn));
         SDL_DestroyTexture(option1Texture);
@@ -109,6 +110,7 @@ void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyRenderer(renderer2);
         SDL_DestroyWindow(window);
+        return;
     }
 
     printf("\n\n\t\t\tEnter any keys to continue.......");

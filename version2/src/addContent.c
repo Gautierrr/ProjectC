@@ -1,10 +1,13 @@
 #include "../main.h"
 
-int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer) {
+int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2) {
+
+    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_RESIZABLE);
+    renderer2 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    
     char query[512];
     MYSQL_RES *result;
 
-    // Récupérer les noms des colonnes de la table
     snprintf(query, sizeof(query), "DESCRIBE %s.%s", dbName, tableName);
 
     if (mysql_query(conn, query) != 0) {
@@ -19,11 +22,9 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
         return 1;
     }
 
-    // Variables pour stocker les noms de colonnes et les valeurs correspondantes
     char columnName[255];
     char columnValue[255];
 
-    // Construire la partie de la requête avec les noms des colonnes
     char columnsPart[1024] = "";
     MYSQL_ROW row;
     while (row = mysql_fetch_row(result)) {
@@ -33,42 +34,45 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
             strcat(columnsPart, ",");
         }
     }
-    columnsPart[strlen(columnsPart) - 1] = '\0'; // Supprimer la virgule à la fin
+    columnsPart[strlen(columnsPart) - 1] = '\0'; // Supprimer la virgule à la fin si elle est mise
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+    SDL_RenderClear(renderer2);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect columnValueRect = { 30, 200, 150, 30 };
 
-    SDL_Rect columnValueRect = { 50, 200, 200, 30 };
+    SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer2, &columnValueRect);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &columnValueRect);
-
-    SDL_Rect textRect = { 50, 100, 300, 30 };
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer2, "img/addContentP.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer2, "img/background3.png");
+    SDL_Rect option1Rect = {10, 75, 600, 200};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    textSurface = TTF_RenderText_Solid(font, "Enter the values for each column (separated by commas and in single quotes) : ", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-    SDL_RenderPresent(renderer);
 
     SDL_Event event;
 
     int done = 0;
     int isTypingUsername = 1;
 
-    // Initialiser les chaînes de caractères à zéro
     memset(columnValue, 0, sizeof(columnValue));
+
+    SDL_RenderClear(renderer2);
+    SDL_RenderCopy(renderer2, backgroundTexture, NULL, NULL);        
+    SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
+    SDL_RenderPresent(renderer2);
 
     while (!done) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                done = 1;
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
+                SDL_DestroyTexture(option1Texture);
+                SDL_DestroyTexture(backgroundTexture);
+                SDL_DestroyRenderer(renderer2);
+                SDL_DestroyWindow(window);
+                return 0;
             } else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
                 done = 1;
             } else if (event.type == SDL_KEYDOWN) {
@@ -82,41 +86,41 @@ int addContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
             } else if (event.type == SDL_TEXTINPUT && isTypingUsername) {
                 strcat(columnValue, event.text.text);
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                SDL_RenderFillRect(renderer, &columnValueRect);
+                SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer2, &columnValueRect);
 
                 textSurface = TTF_RenderText_Solid(font, columnValue, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
                 SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &columnValueRect);
+                SDL_RenderCopy(renderer2, textTexture, NULL, &columnValueRect);
 
-                SDL_RenderPresent(renderer);
+                SDL_RenderPresent(renderer2);
             }
         }
 
         SDL_Delay(10);
     }
 
-    // Demander les valeurs pour chaque colonne (sauf 'id')
-    /*printf("Enter the values for each column (separated by commas) : ");
-    if (fgets(columnValue, sizeof(columnValue), stdin) == NULL) {
-        fprintf(stderr, "Error reading column values.\n");
-        mysql_free_result(result);
-        return 1;
-    }*/
-    columnValue[strcspn(columnValue, "\n")] = '\0'; // Supprimer le caractère de nouvelle ligne
+    columnValue[strcspn(columnValue, "\n")] = '\0';
 
-    // Construire la requête SQL avec les noms de colonnes et les valeurs
     snprintf(query, sizeof(query), "INSERT INTO %s.%s (%s) VALUES (%s)", dbName, tableName, columnsPart, columnValue);
 
     if (mysql_query(conn, query) != 0) {
         fprintf(stderr, "Error adding content: %s\n", mysql_error(conn));
         mysql_free_result(result);
+        SDL_DestroyTexture(option1Texture);
+        SDL_DestroyTexture(backgroundTexture);
+        SDL_DestroyRenderer(renderer2);
+        SDL_DestroyWindow(window);
         return 1;
     }
 
     mysql_free_result(result);
     printf("Content added successfully to the table %s.\n", tableName);
+    SDL_DestroyTexture(option1Texture);
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyRenderer(renderer2);
+    SDL_DestroyWindow(window);
 
     return 0;
 }

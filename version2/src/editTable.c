@@ -1,67 +1,48 @@
 #include "../main.h"
 
-int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2) {
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Window *window = SDL_CreateWindow("Graphical Database Manager", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_RESIZABLE);
+    renderer2 = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    SDL_Rect tableNameRect = { 50, 100, 200, 30 };
-    SDL_Rect columnNameRect = { 50, 250, 200, 30 };
-    SDL_Rect columnTypeRect = { 50, 400, 200, 30 };
+    SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+    SDL_RenderClear(renderer2);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &tableNameRect);
-    SDL_RenderFillRect(renderer, &columnNameRect);
-    SDL_RenderFillRect(renderer, &columnTypeRect);
+    SDL_Rect tableNameRect = { 50, 200, 200, 30 };
 
-    SDL_Rect textRect = { 50, 60, 300, 30 };
+    SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer2, &tableNameRect);
+
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer2, "img/tableNameModify.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer2, "img/background3.png");
+    SDL_Rect option1Rect = {30, 125, 300, 100};
 
     SDL_Surface *textSurface;
     SDL_Texture *textTexture;
     SDL_Color textColor = { 255, 255, 255 };
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 24);
-    // SDL_Color color = {255, 255, 255, 255};
-    textSurface = TTF_RenderText_Solid(font, "Enter the name of the table to modify : ", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    /*textRect.y = 200;
-
-    textSurface = TTF_RenderText_Solid(font, "Enter the name of the new column : ", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
-
-    textRect.y = 360;
-
-    textSurface = TTF_RenderText_Solid(font, "Enter the data type of the new column : ", textColor);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface(textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);*/
-
-    SDL_RenderPresent(renderer);
 
     SDL_Event event;
 
     int done = 0;
     int isTypingTableName = 1;
-    // int isTypingColumnName = 0;
-    // int isTypingTypeName = 0;
     char tableName[100];
-    // char columnName[100];
-    // char columnType[50];
     char query[250];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(tableName, 0, sizeof(tableName));
-    // memset(columnName, 0, sizeof(columnName));
-    // memset(columnType, 0, sizeof(columnType));
+
+    SDL_RenderClear(renderer2);
+    SDL_RenderCopy(renderer2, backgroundTexture, NULL, NULL);        
+    SDL_RenderCopy(renderer2, option1Texture, NULL, &option1Rect);
+    SDL_RenderPresent(renderer2);
 
     while (!done) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
+                SDL_DestroyTexture(option1Texture);
+                SDL_DestroyTexture(backgroundTexture);
+                SDL_DestroyRenderer(renderer2);
+                SDL_DestroyWindow(window);
                 return 0;
             }  else if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_RETURN) {
                     done = 1;
@@ -76,53 +57,28 @@ int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                 } else if (event.type == SDL_TEXTINPUT) {
                 if (isTypingTableName) {
                     strcat(tableName, event.text.text);
-                } /*else if (isTypingColumnName) {
-                    strcat(columnName, event.text.text);
-                } else if (isTypingTypeName) {
-                    strcat(columnType, event.text.text);
-                }*/
+                }
 
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                SDL_RenderFillRect(renderer, &tableNameRect);
-                SDL_RenderFillRect(renderer, &columnNameRect);
-                SDL_RenderFillRect(renderer, &columnTypeRect);
+                SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
+                SDL_RenderFillRect(renderer2, &tableNameRect);
 
                 textSurface = TTF_RenderText_Solid(font, tableName, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+                textTexture = SDL_CreateTextureFromSurface(renderer2, textSurface);
                 SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &tableNameRect);
-                
-                /*textSurface = TTF_RenderText_Solid(font, columnName, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &columnNameRect);
-                
-                textSurface = TTF_RenderText_Solid(font, columnType, textColor);
-                textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                SDL_FreeSurface(textSurface);
-                SDL_RenderCopy(renderer, textTexture, NULL, &columnTypeRect);*/
+                SDL_RenderCopy(renderer2, textTexture, NULL, &tableNameRect);
 
-                SDL_RenderPresent(renderer);
+                SDL_RenderPresent(renderer2);
             }
         }
 
         SDL_Delay(10);
     }
 
+    SDL_DestroyTexture(option1Texture);
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyRenderer(renderer2);
+    SDL_DestroyWindow(window);
+
     int modificationSuccessful = editTableMenu(conn, dbName, tableName, renderer);
-    if (modificationSuccessful) {
-        return 0;
-    }
-
-    /*snprintf(query, sizeof(query), "ALTER TABLE %s ADD COLUMN %s %s", tableName, columnName, columnType);
-
-    if (mysql_query(conn, query) == 0) {
-        printf("\n\n\t\t\tTable '%s' modified successfully.\n\n\n", tableName);
-
-        displayTableColumns(conn, dbName, tableName, renderer);
-    } else {
-        fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
-    }*/
-
-    printf("\n\n\t\t\tEnter any keys to continue.......");
+    return 0;    
 }

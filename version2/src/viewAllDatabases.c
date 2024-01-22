@@ -25,9 +25,13 @@ int viewAllDatabases(SDL_Renderer *renderer) {
 
         SDL_RenderClear(renderer);
 
-        SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/allTables.png");
+        SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/allDatabases.png");
         SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
-        SDL_Rect option1Rect = {600, 200, 450, 150};
+        SDL_Rect option1Rect = {525, 200, 450, 150};
+
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+        SDL_RenderPresent(renderer);
 
         SDL_Rect textRect = {50, 350, 300, 30};
         SDL_Color textColor = {0, 0, 0};
@@ -55,29 +59,20 @@ int viewAllDatabases(SDL_Renderer *renderer) {
             textRect.y += 40;  // Espacement entre chaque base de données
         }
 
+        SDL_RenderPresent(renderer);
         mysql_free_result(result);
         TTF_CloseFont(font);
 
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
-        SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
-
-        SDL_RenderPresent(renderer);
+        
 
         while (!done) {
             while (SDL_PollEvent(&event)) {
-                switch (event.type) {
-                    case SDL_QUIT || SDLK_ESCAPE:
-                        mysql_close(conn);
-                        SDL_DestroyTexture(backgroundTexture);
-                        SDL_DestroyTexture(option1Texture);
-                        SDL_DestroyRenderer(renderer);
-                        done = 1;
-                        break;
-                    case SDL_KEYDOWN:
-                        if (event.key.keysym.sym == SDLK_ESCAPE) {
-                            done = 1;
-                        }
-                        break;
+                if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
+                    mysql_close(conn);
+                    SDL_DestroyTexture(backgroundTexture);
+                    SDL_DestroyTexture(option1Texture);
+                    SDL_DestroyRenderer(renderer);
+                    return 0;
                 }
             }
             SDL_Delay(10);
@@ -87,6 +82,7 @@ int viewAllDatabases(SDL_Renderer *renderer) {
         SDL_DestroyTexture(backgroundTexture);
         SDL_DestroyTexture(option1Texture);
         SDL_DestroyRenderer(renderer);
+        return 0;
     } else {
         fprintf(stderr, "\n\n\t\t\tDatabase connection failed : %s\n", mysql_error(conn));
         printf("\n\n\t\t\tEnter any keys to continue.......");

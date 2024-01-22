@@ -178,15 +178,16 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
 
         SDL_Delay(10);
     }
+    
+    if (strcmp(currentUsername, "admin") == 0) { 
+        strcat(currentUser.studentUsername, currentUsername);
+    }
 
     if (isUsernameTaken2(currentUser.studentUsername, currentUsername)) {
         printf("\n\n\t\t\tUsername is already taken. Please choose a different username.\n");
         return;
     } else {
         if (found) {
-            if (strcmp(currentUsername, "admin") == 0) { 
-                strcat(currentUser.studentUsername, currentUsername);
-            }
 
             fseek(fp, -((long)sizeof(currentUser)), SEEK_CUR);
             fwrite(&currentUser, sizeof(currentUser), 1, fp);

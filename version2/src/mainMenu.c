@@ -40,11 +40,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
                         changeSettings(loggedInUsername, loggedInPassword, renderer);
-                    } /*else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
-                               mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
-                        option = '4';
-                        testMySQLConnection(renderer);
-                    }*/ else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
+                    } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
                         return 0;
@@ -54,6 +50,7 @@ int mainMenu(char *loggedInUsername, char *loggedInPassword, SDL_Renderer *rende
         }
 
         SDL_RenderClear(renderer);
+
         SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
         SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
         SDL_RenderCopy(renderer, option2Texture, NULL, &option2Rect);

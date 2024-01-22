@@ -1167,7 +1167,14 @@ stateConnect(int *connect)
 // createTable
 // deleteTable
 // renameTable
-
+// editTable
+// editTableMenu
+// addColumn
+// addPrimaryKey -> Id en auto-Increment donc impossible de changer de clé primaires
+// addForeignKey
+// addContent
+// deleteContent
+// displayContent
 
 
 

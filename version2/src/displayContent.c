@@ -23,13 +23,20 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
     // Récupérer le nombre de colonnes
     int numFields = mysql_num_fields(result);
 
-    // Afficher les noms des colonnes dans la fenêtre graphique
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_Rect textRect = {50, 60, 150, 30};  // Ajustez la largeur de la zone de texte pour les noms des colonnes
+    SDL_Texture *option1Texture = IMG_LoadTexture(renderer, "img/allValues.png");
+    SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
+    SDL_Rect option1Rect = {550, 200, 450, 150};
+
+    SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+    SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Rect textRect = {50, 340, 80, 30};
     TTF_Font *font = TTF_OpenFont("fonts/roboto/Roboto-Regular.ttf", 18);
-    SDL_Color textColor = {255, 255, 255};
+    SDL_Color textColor = {0, 0, 0};
 
     MYSQL_FIELD *field;
     int currentX = 50;
@@ -45,16 +52,17 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
         SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
         SDL_DestroyTexture(textTexture);
 
-        currentX += 200;  // Ajustez la valeur pour l'espacement entre les colonnes
+        currentX += 120;  // Ajustez la valeur pour l'espacement entre les colonnes
     }
 
     // Afficher les valeurs de chaque ligne dans la fenêtre graphique
-    int currentY = 90;  // Ajustez la valeur pour l'espacement vertical entre les lignes
+    int currentY = 380;  // Ajustez la valeur pour l'espacement vertical entre les lignes
+    int lineHeight = 20;  // Hauteur de chaque ligne
+    int columnWidth = 80;  // Largeur de chaque colonne
 
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result))) {
         currentX = 50;
-
         for (int i = 0; i < numFields; i++) {
             textRect.x = currentX;
             textRect.y = currentY;
@@ -66,10 +74,16 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
             SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
             SDL_DestroyTexture(textTexture);
 
-            currentX += 200;  // Ajustez la valeur pour l'espacement entre les colonnes
+            currentX += 120;  // Ajoutez une marge de 10 pixels entre chaque colonne
         }
 
-        currentY += 30;  // Ajustez la valeur pour l'espacement vertical entre les lignes
+        currentY += lineHeight + 20;  // Ajustez la valeur pour l'espacement vertical entre les lignes
+
+        // Si la nouvelle position Y dépasse la hauteur de la fenêtre, passez à la ligne suivante
+        if (currentY + lineHeight > 780) {
+            currentY = 380;  // Réinitialisez la position Y
+            currentX += columnWidth + 50;  // Passez à la droite de la première partie de la liste
+        }
     }
 
     SDL_RenderPresent(renderer);
@@ -80,7 +94,7 @@ int displayContent(MYSQL *conn, const char *dbName, const char *tableName, SDL_R
 
     while (!quit) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 quit = 1;
             }
         }

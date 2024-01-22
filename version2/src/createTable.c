@@ -29,7 +29,6 @@ void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2) {
     char tableName[100];
     char query[150];
 
-    // Initialiser les chaînes de caractères à zéro
     memset(tableName, 0, sizeof(tableName));
 
     SDL_RenderClear(renderer2);
