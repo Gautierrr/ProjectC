@@ -206,6 +206,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                             SDL_DestroyTexture(option3Texture);
                             SDL_DestroyRenderer(renderer2);
                             SDL_DestroyWindow(window);
+                            return 0;
                         } else if (event.type == SDL_KEYDOWN) {
                             if (event.key.keysym.sym == SDLK_RETURN) {
                             if (isTypingTableName) {
@@ -264,6 +265,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                     SDL_DestroyTexture(option3Texture);
                     SDL_DestroyRenderer(renderer2);
                     SDL_DestroyWindow(window);
+                    return 0;
                 } else {
                     fprintf(stderr, "\n\n\t\t\tError modifying table: %s\n", mysql_error(conn));
                 }
@@ -273,6 +275,7 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
                 SDL_DestroyTexture(option3Texture);
                 SDL_DestroyRenderer(renderer2);
                 SDL_DestroyWindow(window);
+                return 0;
             } else {
                 fprintf(stderr, "\n\t\t\tFailed to retrieve tables: %s\n", mysql_error(conn));
             }
@@ -282,4 +285,5 @@ int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Rende
     } else {
         fprintf(stderr, "\n\t\t\tFailed to select database '%s': %s\n", dbName, mysql_error(conn));
     }
+    return 0;
 }

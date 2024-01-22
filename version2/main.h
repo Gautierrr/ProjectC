@@ -64,17 +64,17 @@ void changeSettings(char *currentUsername, char *currentPassword, SDL_Renderer *
 int createDatabase(char *loggedInUsername);
 int loadDatabase(char *loggedInUsername, SDL_Renderer *renderer);
 void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_Renderer *renderer2);
-int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2);
+int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 int clickTable(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer2);
 int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-
-// display + viewMcd doivent pouvoir se fermer
-
-
-void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
-int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+void createTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer2);
 void deleteTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+void renameTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
+
+
+
+
+int editTable(MYSQL *conn, const char *dbName, SDL_Renderer *renderer);
 void displayTableColumns(MYSQL *conn, const char *dbName, const char *tableName, SDL_Renderer *renderer);
 
 

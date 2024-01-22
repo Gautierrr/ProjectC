@@ -36,7 +36,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
                     if (mouseX > option1Rect.x && mouseX < option1Rect.x + option1Rect.w &&
                         mouseY > option1Rect.y && mouseY < option1Rect.y + option1Rect.h) {
                         option = '1';
-                        displayAllTables(conn, dbName, renderer, renderer2);
+                        displayAllTables(conn, dbName, renderer);
                     } else if (mouseX > option2Rect.x && mouseX < option2Rect.x + option2Rect.w &&
                                mouseY > option2Rect.y && mouseY < option2Rect.y + option2Rect.h) {
                         option = '2';
@@ -44,7 +44,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
                     } else if (mouseX > option3Rect.x && mouseX < option3Rect.x + option3Rect.w &&
                                mouseY > option3Rect.y && mouseY < option3Rect.y + option3Rect.h) {
                         option = '3';
-                        createTable(conn, dbName, renderer);
+                        createTable(conn, dbName, renderer2);
                     } else if (mouseX > option4Rect.x && mouseX < option4Rect.x + option4Rect.w &&
                                mouseY > option4Rect.y && mouseY < option4Rect.y + option4Rect.h) {
                         option = '4';

@@ -1164,6 +1164,18 @@ stateConnect(int *connect)
 // displayAllTables
 // clickTable
 // viewMcd
+// createTable
+// deleteTable
+// renameTable
+
+
+
+
+
+
+
+
+
 
 
 

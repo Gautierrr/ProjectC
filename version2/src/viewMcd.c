@@ -59,6 +59,7 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                         maxTableHeight = currentTableHeight;
                     }
 
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                     SDL_Rect tableRect = {tables[numTables].x, tables[numTables].y, tableWidth, tableHeight};
                     SDL_RenderDrawRect(renderer, &tableRect);
                     SDL_RenderFillRect(renderer, &tableRect);
@@ -193,11 +194,7 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
 
                 while (!quit) {
                     while (SDL_PollEvent(&event)) {
-                        if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
-                            mysql_free_result(result);
-                            SDL_DestroyTexture(backgroundTexture);
-                            SDL_DestroyTexture(option1Texture);
-                            SDL_DestroyRenderer(renderer);
+                        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                             quit = 1;
                             return 0;
                         } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
@@ -211,10 +208,8 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
                                 if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
                                     event.button.y >= tableY && event.button.y <= tableY + tableHeight) {
                                     int modificationSuccessful = clickTable(conn, dbName, tables[i].name, renderer);
-                                    if (modificationSuccessful) {
-                                        SDL_DestroyTexture(backgroundTexture);
-                                        SDL_DestroyTexture(option1Texture);
-                                        SDL_DestroyRenderer(renderer);
+                                    if (modificationSuccessful || !modificationSuccessful) {
+                                        quit = 1;
                                         return 0;
                                     }
                                 }
@@ -239,5 +234,5 @@ int viewMcd(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     }
 
     SDL_DestroyRenderer(renderer);
-    SDL_Quit();
+    return 0;
 }

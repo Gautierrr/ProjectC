@@ -1,6 +1,6 @@
 #include "../main.h"
 
-int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SDL_Renderer *renderer2) {
+int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer) {
     if (mysql_select_db(conn, dbName) == 0) {
         char query[200];
         snprintf(query, sizeof(query),
@@ -26,7 +26,6 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SD
                 SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
                 SDL_Rect option1Rect = {550, 200, 450, 150};
 
-                SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
                 SDL_RenderCopy(renderer, option1Texture, NULL, &option1Rect);
                 SDL_RenderPresent(renderer);
@@ -143,7 +142,7 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SD
                     if (currentX + tableWidth + margin > screenWidth) {
                         currentX = margin;
                         currentY += maxTableHeight + tableHeight + margin * 2;
-                        maxTableHeight;
+                        maxTableHeight = 0;  // Ajout de cette ligne pour réinitialiser maxTableHeight
                     }
 
                     numTables++;
@@ -157,10 +156,6 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SD
                 while (!quit) {
                     while (SDL_PollEvent(&event)) {
                         if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
-                            mysql_free_result(result);
-                            SDL_DestroyTexture(backgroundTexture);
-                            SDL_DestroyTexture(option1Texture);
-                            SDL_DestroyRenderer(renderer);
                             quit = 1;
                             return 0;
                         } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
@@ -169,15 +164,13 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SD
                                 int tableX = tables[i].x;
                                 int tableY = tables[i].y;
                                 int tableWidth = 200;  // Ajustez la largeur de la table
-                                int tableHeight;  // Ajustez la hauteur de la table
+                                int tableHeight = 40;  // Ajustez la hauteur de la table
 
                                 if (event.button.x >= tableX && event.button.x <= tableX + tableWidth &&
                                     event.button.y >= tableY && event.button.y <= tableY + tableHeight) {
                                     int modificationSuccessful = clickTable(conn, dbName, tables[i].name, renderer);
-                                    if (modificationSuccessful) {
-                                        SDL_DestroyTexture(backgroundTexture);
-                                        SDL_DestroyTexture(option1Texture);
-                                        SDL_DestroyRenderer(renderer);
+                                    if (modificationSuccessful || !modificationSuccessful) {
+                                        quit = 1;
                                         return 0;
                                     }
                                 }
@@ -202,4 +195,5 @@ int displayAllTables(MYSQL *conn, const char *dbName, SDL_Renderer *renderer, SD
     }
 
     SDL_DestroyRenderer(renderer);
+    return 0;
 }
