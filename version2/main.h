@@ -84,6 +84,8 @@ int viewAllDatabases(SDL_Renderer *renderer);
 int deleteDatabase(SDL_Renderer *renderer);
 int downloadImg(SDL_Renderer *renderer);
 
+int exportDatabase(MYSQL *conn, const char *dbName);
+void exportDatabaseValidation(SDL_Renderer *renderer);
 void errorAccount(SDL_Renderer *renderer);
 void errorDatabase(SDL_Renderer *renderer);
 void errorTable(SDL_Renderer *renderer);

@@ -10,6 +10,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
     SDL_Texture *option4Texture = IMG_LoadTexture(renderer, "img/renameTable.png");
     SDL_Texture *option5Texture = IMG_LoadTexture(renderer, "img/editTable.png");
     SDL_Texture *option6Texture = IMG_LoadTexture(renderer, "img/deleteTable.png");
+    SDL_Texture *option7Texture = IMG_LoadTexture(renderer, "img/exportDatabase.png");
     SDL_Texture *option0Texture = IMG_LoadTexture(renderer, "img/exit.png");
     SDL_Texture *backgroundTexture = IMG_LoadTexture(renderer, "img/banniere.png");
 
@@ -19,6 +20,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
     SDL_Rect option4Rect = {1025, 200, 300, 100};
     SDL_Rect option5Rect = {1025, 350, 300, 100};
     SDL_Rect option6Rect = {1025, 500, 300, 100};
+    SDL_Rect option7Rect = {10, 700, 300, 100};
     SDL_Rect option0Rect = {1300, 700, 150, 50};
 
     char option;
@@ -57,6 +59,14 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
                                mouseY > option6Rect.y && mouseY < option6Rect.y + option6Rect.h) {
                         option = '6';
                         deleteTable(conn, dbName, renderer);
+                    } else if (mouseX > option7Rect.x && mouseX < option7Rect.x + option7Rect.w &&
+                               mouseY > option7Rect.y && mouseY < option7Rect.y + option7Rect.h) {
+                        option = '7';
+                        if (!exportDatabase(conn, dbName)){
+                            exportDatabaseValidation(renderer);
+                        } else {
+                            errorDatabase(renderer);
+                        }
                     } else if (mouseX > option0Rect.x && mouseX < option0Rect.x + option0Rect.w &&
                                mouseY > option0Rect.y && mouseY < option0Rect.y + option0Rect.h) {
                         option = '0';
@@ -75,6 +85,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
         SDL_RenderCopy(renderer, option4Texture, NULL, &option4Rect);
         SDL_RenderCopy(renderer, option5Texture, NULL, &option5Rect);
         SDL_RenderCopy(renderer, option6Texture, NULL, &option6Rect);
+        SDL_RenderCopy(renderer, option7Texture, NULL, &option7Rect);
         SDL_RenderCopy(renderer, option0Texture, NULL, &option0Rect);
 
         SDL_RenderPresent(renderer);
@@ -87,6 +98,7 @@ void databaseMenu(MYSQL *conn, SDL_Renderer *renderer, const char *dbName, SDL_R
     SDL_DestroyTexture(option4Texture);
     SDL_DestroyTexture(option5Texture);
     SDL_DestroyTexture(option6Texture);
+    SDL_DestroyTexture(option7Texture);
     SDL_DestroyTexture(option0Texture);
 
     SDL_DestroyRenderer(renderer);
